@@ -7,6 +7,20 @@
     </url>
     
     <url>
+        <loc>https://leodpen.github.io/tags/</loc>
+        <lastmod>2019-06-03T15:09:02.682Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://leodpen.github.io/archive/</loc>
+        <lastmod>2019-06-03T15:06:39.133Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
         <loc>https://leodpen.github.io/about/</loc>
         <lastmod>2019-06-03T03:54:12.475Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -15,20 +29,6 @@
     
     <url>
         <loc>https://leodpen.github.io/404.html</loc>
-        <lastmod>2019-06-01T19:34:02.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    
-    <url>
-        <loc>https://leodpen.github.io/archive/</loc>
-        <lastmod>2019-06-01T19:34:02.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    
-    <url>
-        <loc>https://leodpen.github.io/tags/</loc>
         <lastmod>2019-06-01T19:34:02.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
