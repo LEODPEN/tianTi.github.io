@@ -3,7 +3,7 @@
 
     <sitemap>
         <loc>https://mpy634.cn/post-sitemap.xml</loc>
-        <lastmod>2019-06-03T15:54:29.464Z</lastmod>
+        <lastmod>2019-06-04T15:10:03.105Z</lastmod>
     </sitemap>
 
     <sitemap>
@@ -12,8 +12,13 @@
     </sitemap>
 
     <sitemap>
+        <loc>https://mpy634.cn/category-sitemap.xml</loc>
+        <lastmod>2019-06-04T15:03:38.110Z</lastmod>
+    </sitemap>
+
+    <sitemap>
         <loc>https://mpy634.cn/tag-sitemap.xml</loc>
-        <lastmod>2019-06-03T15:54:29.464Z</lastmod>
+        <lastmod>2019-06-04T15:03:38.110Z</lastmod>
     </sitemap>
 
 </sitemapindex>
