@@ -37,15 +37,29 @@
     </url>
 
     <url>
-        <loc>https://mpy634.cn/tags/Life/</loc>
+        <loc>https://mpy634.cn/tags/%E6%95%B0%E6%A8%A1/</loc>
         <lastmod>2019-10-20T06:51:02.909Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://mpy634.cn/tags/%E6%95%B0%E6%A8%A1/</loc>
-        <lastmod>2019-10-20T06:51:02.909Z</lastmod>
+        <loc>https://mpy634.cn/tags/Life/</loc>
+        <lastmod>2019-11-27T10:09:45.800Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Hackathon/</loc>
+        <lastmod>2019-11-27T10:09:45.800Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Travel/</loc>
+        <lastmod>2019-11-27T10:09:45.800Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
