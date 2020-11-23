@@ -220,7 +220,7 @@
 <hr>
 <h2><span id="发生甚么事了">发生甚么事了?</span></h2>
 <p>  疫情严重，学校也搞了个健康打卡小程序，要求同学每天打卡。但是常常会有同学忘记打卡，于是则会被早上10点微信消息+辅导员挂在群里双重提醒。。。</p>
-<div align="center"><img width="80%" height="80%" src="2.jpg"></div>
+<div align="center"><img width="30%" height="30%" src="2.jpg"></div>
 <p>  我猜想部分同学是忘记了，部分同学则是早上10点还没起床，这个时候就需要一个”兄弟“帮忙打卡（当然你要保证自己是健康的。。。）</p>
 <h2><span id="大意了抓不到包">大意了，抓不到包</span></h2>
 <p>  首先就是一个Charles来抓手机https的包，但是现在的微信小程序很强，抓不得。紧接着看了很多其他解决方案，回头想尝试，发现是自己华为手机，于是只有另寻出路。</p>
@@ -237,10 +237,11 @@
 <p>  为了机器能直接跑，不下载额外的包，要选择用机器内置的东西，所以Mac和Linux下脚本还是有点区别的。比如d<code>date</code>、<code>md5sum</code>等等，毕竟Mac下用<code>date</code>是取不到纳秒的，还是只有用<code>gdate</code>（当然Mac也可以下载<code>coreutils</code>然后直接设置下软链接，如下）</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">brew install coreutils</span><br><span class="line">sudo ln -sv /usr/local/bin/gdate /usr/local/bin/date</span><br></pre></td></tr></table></figure>
 <p>  然后有类似下图则说明OK了。如果要Mac下用<code>md5sum</code>也是类似的。</p>
-<div align="center"><img width="80%" height="80%" src="4.png"></div>
+<div align="center"><img width="30%" height="30%" src="4.png"></div>
 <h2><span id="完事">完事</span></h2>
 <p>  写好了之后自然是点到为止，但是想了一下还是决定加个密。于是用了shc来加密了脚本，注意加密的时候把脚本的用户权限，不是可执行的话改一下就行。</p>
-<p>  最后<code>scp</code>传到服务器上去，写个定时任务跑，比如我设置的就是每天早上9:28打卡。【如果Mac下发现定时任务跑不了，大概率是磁盘的权限不够，看后另一篇文】</p>
+<p>  最后<code>scp</code>传到服务器上去，写个定时任务跑，比如我设置的就是每天早上9:28打卡。【如果Mac下发现定时任务跑不了，大概率是磁盘的权限不够，看另一篇解决】</p>
+<div align="center"><img width="30%" height="30%" src="5.png"></div>
 <h2><span id="下载使用">下载使用</span></h2>
 <p>  下面是脚本文件的下载链接：</p>
 <ul>
