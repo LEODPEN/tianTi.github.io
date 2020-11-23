@@ -7,6 +7,14 @@
     </url>
 
     <url>
+        <loc>https://mpy634.cn/2020/11/23/Health-Script/</loc>
+        <lastmod>2020-11-23T14:30:27.915Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://mpy634.cn/2020/01/25/Conda%20onon%20MacOS%20Catalina/</loc>
         <lastmod>2020-04-17T05:33:33.015Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -16,7 +24,7 @@
 
     <url>
         <loc>https://mpy634.cn/2020/04/17/SAE/</loc>
-        <lastmod>2020-04-17T05:26:32.960Z</lastmod>
+        <lastmod>2020-04-17T05:28:45.184Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
