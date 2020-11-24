@@ -144,14 +144,14 @@
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -234,7 +234,7 @@
 <blockquote>
 <p>下载的脚本文件是不需要额外下载操作的</p>
 </blockquote>
-<p>  为了机器能直接跑，不下载额外的包，要选择用机器内置的东西，所以Mac和Linux下脚本还是有点区别的。比如d<code>date</code>、<code>md5sum</code>等等，毕竟Mac下用<code>date</code>是取不到纳秒的，还是只有用<code>gdate</code>（当然Mac也可以下载<code>coreutils</code>然后直接设置下软链接，如下）</p>
+<p>  为了机器能直接跑，不下载额外的包，要选择用机器内置的东西，所以Mac和Linux下脚本还是有点区别的。比如<code>date</code>、<code>md5sum</code>等等，毕竟Mac下用<code>date</code>是取不到纳秒的，还是只有用<code>gdate</code>（当然Mac也可以下载<code>coreutils</code>然后直接设置下软链接，如下）</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">brew install coreutils</span><br><span class="line">sudo ln -sv /usr/local/bin/gdate /usr/local/bin/date</span><br></pre></td></tr></table></figure>
 <p>  然后有类似下图则说明OK了。如果要Mac下用<code>md5sum</code>也是类似的。</p>
 <div align="center"><img width="30%" height="30%" src="4.png"></div>
@@ -254,7 +254,7 @@
 </ul>
 <p>  建议直接新建一个文件夹将脚本放进去，每天的打卡状态及提示会在你调用后写到日志文件<code>health.log</code>中，不需要的话删除就行。</p>
 <p>  假设服务器是腾讯云的，且所在文件夹名字为health：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 到h绝对路径/ealth目录下</span><br><span class="line"><span class="meta">#</span> 一般腾讯云服务器上都已经会有一些自带的定时任务了</span><br><span class="line">crontab -e</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 在已有的任务后下面一行【需要其他时间改一下表达式即可】</span><br><span class="line">28 9 * * * /health/health_linux.sh.x &lt;学号&gt; &lt;名字&gt;</span><br><span class="line"><span class="meta">#</span> 最后可以crontab -l 看看任务情况；不需要了直接在删掉这一行就行</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>### ####  ####  ####  ####  ####</span><br><span class="line"><span class="meta">#</span> 当然也可以直接单次调用，不用定时</span><br><span class="line">./health_linux.sh.x &lt;学号&gt; &lt;名字&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 到绝对路径/health目录下</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 一般腾讯云服务器上都已经会有一些自带的定时任务了</span></span><br><span class="line">crontab -e</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 在已有的任务后下面一行【需要其他时间改一下表达式即可】</span></span><br><span class="line">28 9 * * * /health/health_linux.sh.x &lt;学号&gt; &lt;名字&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 最后可以crontab -l 看看任务情况；不需要了直接在删掉这一行就行</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">### ####  ####  ####  ####  ####</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 当然也可以直接单次调用，不用定时</span></span><br><span class="line">./health_linux.sh.x &lt;学号&gt; &lt;名字&gt;</span><br></pre></td></tr></table></figure>
 
                 
 
