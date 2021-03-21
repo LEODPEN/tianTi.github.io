@@ -28,13 +28,6 @@
     </url>
 
     <url>
-        <loc>https://mpy634.cn/categories/movies/</loc>
-        <lastmod>2020-11-23T06:37:04.618Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://mpy634.cn/categories/code/</loc>
         <lastmod>2020-11-24T07:23:52.855Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -44,6 +37,13 @@
     <url>
         <loc>https://mpy634.cn/categories/code/usage/</loc>
         <lastmod>2020-11-24T07:23:52.855Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/categories/movies/</loc>
+        <lastmod>2021-03-21T10:53:35.017Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

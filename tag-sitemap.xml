@@ -2,13 +2,6 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
     <url>
-        <loc>https://mpy634.cn/tags/TV-series/</loc>
-        <lastmod>2019-10-15T10:08:22.117Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://mpy634.cn/tags/LOL/</loc>
         <lastmod>2019-10-20T06:51:02.909Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -79,20 +72,6 @@
     </url>
 
     <url>
-        <loc>https://mpy634.cn/tags/Movie/</loc>
-        <lastmod>2020-11-23T06:37:04.618Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://mpy634.cn/tags/Life/</loc>
-        <lastmod>2020-11-24T07:23:52.855Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://mpy634.cn/tags/Shell/</loc>
         <lastmod>2020-11-24T07:23:52.855Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -102,6 +81,27 @@
     <url>
         <loc>https://mpy634.cn/tags/Tool/</loc>
         <lastmod>2020-11-24T07:23:52.855Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/TV-series/</loc>
+        <lastmod>2021-03-21T10:39:01.909Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Life/</loc>
+        <lastmod>2021-03-21T10:53:35.017Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Movie/</loc>
+        <lastmod>2021-03-21T10:53:35.017Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
