@@ -6,7 +6,7 @@
   <link href="https://mpy634.cn/feed.xml" rel="self"/>
   
   <link href="https://mpy634.cn/"/>
-  <updated>2021-03-21T10:53:35.017Z</updated>
+  <updated>2021-04-28T09:41:49.002Z</updated>
   <id>https://mpy634.cn/</id>
   
   <author>
@@ -17,11 +17,42 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>并发情况下长事务的死锁问题分析及解决方案设计</title>
+    <link href="https://mpy634.cn/2021/04/28/MySQL%20DeadLock/"/>
+    <id>https://mpy634.cn/2021/04/28/MySQL%20DeadLock/</id>
+    <published>2021-04-28T08:44:44.000Z</published>
+    <updated>2021-04-28T09:41:49.002Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html"></summary>
+        
+      
+    
+    
+    
+    <category term="usage" scheme="https://mpy634.cn/categories/usage/"/>
+    
+    
+    <category term="Java" scheme="https://mpy634.cn/tags/Java/"/>
+    
+    <category term="MySQL 5.x" scheme="https://mpy634.cn/tags/MySQL-5-x/"/>
+    
+    <category term="Transaction" scheme="https://mpy634.cn/tags/Transaction/"/>
+    
+    <category term="DeadLock" scheme="https://mpy634.cn/tags/DeadLock/"/>
+    
+  </entry>
+  
+  <entry>
     <title>夏夜里的晚风，从斯坦福吹向好莱坞</title>
     <link href="https://mpy634.cn/2021/01/25/Summer%20wind/"/>
     <id>https://mpy634.cn/2021/01/25/Summer%20wind/</id>
     <published>2021-01-25T03:30:00.000Z</published>
-    <updated>2021-03-21T10:53:35.017Z</updated>
+    <updated>2021-04-25T14:18:58.760Z</updated>
     
     
       
@@ -79,7 +110,7 @@
     <link href="https://mpy634.cn/2020/04/17/SAE/"/>
     <id>https://mpy634.cn/2020/04/17/SAE/</id>
     <published>2020-04-17T04:44:44.000Z</published>
-    <updated>2020-11-23T06:31:19.928Z</updated>
+    <updated>2021-04-28T04:29:03.736Z</updated>
     
     
       

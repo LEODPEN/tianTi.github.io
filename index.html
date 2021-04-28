@@ -210,6 +210,46 @@
 
 <div class="post-preview">
 
+    <a href="/2021/04/28/MySQL DeadLock/">
+        <h2 class="post-title">
+            并发情况下长事务的死锁问题分析及解决方案设计
+        </h2>
+        <h3 class="post-subtitle">
+            好久没有更新了啊
+        </h3>
+        <div class="post-content-preview">
+            说在一切之前
+各种博客死锁问题的分析和demo还蛮多的，但是真正涉及实际业务的并发情况下的死锁场景后，发现情况还蛮丰富的啊。。。
+此外，这篇博客不会讲述具体理论，阅读需要一定的前置知识，比如事务隔离级别、相关锁的概念、死锁条件及加锁原因和场景等等。
+背景图与正文无关，只是偶然看见，烬和男枪都被换弹阻塞，结局会怎么样呢？
+问题出现
+场景
+公司每天都会有少量线上死锁问题告警(com.mysql.......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by LEODPEN on
+            2021-04-28
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#Java" title="Java">Java</a>
+            
+              <a href="/tags/#MySQL 5.x" title="MySQL 5.x">MySQL 5.x</a>
+            
+              <a href="/tags/#Transaction" title="Transaction">Transaction</a>
+            
+              <a href="/tags/#DeadLock" title="DeadLock">DeadLock</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
     <a href="/2021/01/25/Summer wind/">
         <h2 class="post-title">
             夏夜里的晚风，从斯坦福吹向好莱坞
@@ -527,51 +567,16 @@ Fall
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/2019/05/21/hexo-theme-beantech/">
-        <h2 class="post-title">
-             A Test At First
-        </h2>
-        <h3 class="post-subtitle">
-            Begin.
-        </h3>
-        <div class="post-content-preview">
-            
-Usage
-
-Some usages to display.
-Init
-
-123git clone https://github.com/YenYuHsuan/hexo-theme-beantech.git ./hexo-beantechcd hexo-beantechnpm install
-Modify
-
-Modify _config.yml file with your own inf......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by LEODPEN on
-            2019-05-21
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#Usage" title="Usage">Usage</a>
-            
-              <a href="/tags/#Blog" title="Blog">Blog</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
 
 <ul class="pager">
     
+    
+        <li class="next">
+            <a href="/archives/2/">Older Posts &rarr;</a>
+        </li>
     
 </ul>
 
@@ -650,6 +655,10 @@ Modify _config.yml file with your own inf......
     <ul>
       
         <li>
+          <a href="/2021/04/28/MySQL DeadLock/">并发情况下长事务的死锁问题分析及解决方案设计</a>
+        </li>
+      
+        <li>
           <a href="/2021/01/25/Summer wind/">夏夜里的晚风，从斯坦福吹向好莱坞</a>
         </li>
       
@@ -663,10 +672,6 @@ Modify _config.yml file with your own inf......
       
         <li>
           <a href="/2020/01/25/Conda onon MacOS Catalina/">更新到Catalina后文件被搬家了？风扇狂转？</a>
-        </li>
-      
-        <li>
-          <a href="/2019/11/27/Hackathon_2019@EastChina/">华东 hackathon 之旅</a>
         </li>
       
     </ul>
@@ -699,7 +704,7 @@ Modify _config.yml file with your own inf......
         
     <h5>ARCHIVES</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">January 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">April 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">January 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a><span class="archive-list-count">1</span></li></ul>
     </div>
 
         <hr>
@@ -708,7 +713,7 @@ Modify _config.yml file with your own inf......
 
     <h5>categories
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/LOL/">LOL</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/code/">code</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/code/usage/">usage</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/experience/">experience</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/movies/">movies</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/usage/">usage</a><span class="category-list-count">3</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/LOL/">LOL</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/code/">code</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/code/usage/">usage</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/experience/">experience</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/movies/">movies</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/usage/">usage</a><span class="category-list-count">4</span></li></ul>
     </div>
 </h5>
         <hr>
