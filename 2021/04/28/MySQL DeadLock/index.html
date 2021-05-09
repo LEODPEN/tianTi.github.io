@@ -147,14 +147,14 @@
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -236,6 +236,7 @@
 <h2><span id="事务执行流程简示">事务执行流程简示</span></h2>
 <p>对流程简图进行展示：</p>
 <div align="center"><img width="50%" height="50%" src="1.png"></div>
+<p>(配图错了，最后一个是向author表插数据)</p>
 <h2><span id="表结构分析">表结构分析</span></h2>
 <p>这里对相应的两个表简化并改名，具体代表什么见上面的加粗示意。</p>
 <h3><span id="e表">E表</span></h3>
@@ -301,7 +302,8 @@
 </ul>
 <div align="center"><img width="100%" height="100%" src="2.png"></div>
 <p>第4步再说明：</p>
-<p>对于唯一键的插入操作，会找到其后的记录，如果其上没有gap锁（此时没有），就会加insert intention lock，然后再去做唯一性检测 &amp; 加其他锁操作；</p>
+<p>对于唯一键的插入操作，会找到其后的记录，如果其上有gap锁（此时没有），就会加insert intention lock进行等待；</p>
+<p>PS：说明这里insert操作是完整的。</p>
 <h3><span id="最常见情况">最常见情况</span></h3>
 <p>最常见情况下，主要表现为出现S锁，对于其出现，其时SQL分别为：</p>
 <p>事务1：delete from <code>E</code> WHERE ( cid = 205 );</p>
@@ -311,11 +313,7 @@
 <ul>
 <li>
 <p>事务2第四步，为什么是持有S锁？</p>
-<p>答：在给其后记录加了插入意向锁后，发现插入项被加了锁(被删除了但是未purge)，于是需要获取S锁；</p>
-</li>
-<li>
-<p>第四步后，为什么S锁没有升级成X锁，而在死锁日志显示持有S锁？</p>
-<p>答：猜想是S锁在insert成功后是异步升级为X锁，在这期间发生了死锁；</p>
+<p>答：唯一性检测时，发现插入项被加了锁(被前面delete了但是未purge)，于是需要获取S锁(锁不止一个记录，因此是范围S锁而不是not gap)；</p>
 </li>
 <li>
 <p>既然是持有S锁，那么可不可能是有重复请求，导致duplicate key（1062）错误，因此持有S锁且不升级X锁？</p>
@@ -327,12 +325,14 @@
 <p>事务1：insert into <code>E</code> (cid, key, other) values (214, ‘xxx’, 'xxx) , (214, ‘yyy’, ‘yyy’) , (214, ‘zzz’, ‘zzz’) , ***;</p>
 <p>事务2：delete from <code>E</code> WHERE ( cid = 230 );</p>
 <div align="center"><img width="100%" height="100%" src="4.png"></div>
+<p>需要注意的点：<br>
+因为<code>cid</code>既是非唯一索引，又是唯一索引的前缀组成部分，因此insert时候，除了要走唯一键流程，还要走非唯一键流程，这里就是唯一键流程OK，非唯一键流程卡主了；</p>
 <h1><span id="解决方案设计">解决方案设计</span></h1>
 <h2><span id="限制考虑">限制考虑</span></h2>
 <p>解决时考虑限制：</p>
 <ul>
 <li>
-<p>需要考虑到是多表的操作，一般情况下原子性不能丢失（所有成功才算成功，这也是大事务出现的原因）；</p>
+<p>需要考虑到是多表的操作，一般情况下原子性不能丢失（所有成功才算成功）；</p>
 </li>
 <li>
 <p>保证原流程不受影响（出问题切回去，甚至设置批次id级别的灰度试试）；</p>
@@ -341,7 +341,7 @@
 <p>尽量别引入其他中间件（复杂了反而不好）；</p>
 </li>
 </ul>
-<p>##= 方案1</p>
+<h2><span id="方案1">方案1</span></h2>
 <p>修改RR模式为RC模式，消除间隙锁，以大大减低死锁发生概率；</p>
 <h2><span id="方案2">方案2</span></h2>
 <p>本来方案2有三种，这里直接给出其中我个人认为最友好的一种；</p>
@@ -350,28 +350,32 @@
 <li>拆分大事务为小事务，并分情况选取流程；</li>
 <li>是否强制原流程应有其他线上配置管理；</li>
 <li>加一个简单记录表作为补偿日志表;【表结构可为(id, cid, param_str, addTime, status)】（Gson转换入参bean）；</li>
-<li>请求来时还需要判断下是否为定时任务的补偿请求（查补偿记录表，并看status）;</li>
+<li>对其他欲接入的有定时修改批次需求的上游一个新接口，里面包含参数(Option，option内暂有一个字段即是否走新流程);【加新接口或原接口内改动】;</li>
 </ul>
 <p>改造后流程图：</p>
 <div align="center"><img width="80%" height="80%" src="5.png"></div>
 <h3><span id="几个问题">几个问题</span></h3>
 <ul>
 <li>
-<p>为什么<code>a</code>表要单独提出来判断一次?</p>
-<p>答：因为发现很多形式都是(cid, “null”)，且无变动，没必要删了再插入；【根据业务场景考虑】</p>
+<p>这样设计会不会还有死锁？该怎么避免?</p>
+<p>答：超极端情况下会有，例如情况3；删除IX_CoupongroupId即可，其实也是可以删除的，毕竟已经有了唯一索引了。。。</p>
 </li>
 <li>
 <p>为什么<code>c</code>等其他表不需要拆出来进行事务？</p>
-<p>答：不需要，看其表结构，cid为主键一部分，操作不会引发死锁；</p>
+<p>答：不需要，看其表结构，<code>cid</code>为主键一部分，删插不会引发死锁；所以这一块还是尽量保证原子性，以求真正处于中间状态的券批次的中间数据少；</p>
+</li>
+<li>
+<p>拆分出来的三个事务的执行先后顺序怎么确定？<br>
+答：可以更改，图中这样的顺序主要是为了出现极端问题快速失败；</p>
 </li>
 <li>
 <p>涉及多表的操作，如果出现中间数据状态怎么办（改了一半）？</p>
-<p>答：新流程，只有在<code>e</code>表或<code>a</code>表出现失败现象后出现数据中间状态（非原数据状态、非更新后数据应有状态），概率较低，且考虑到1. 凌晨n点操作; 2. 能通过补偿快速; 因此新流程中信息的完整性与正确性有一定保障；<br>
+<p>答：新流程，只有在<code>e</code>表或<code>a</code>表出现失败现象后出现数据中间状态（非原数据状态、非更新后数据应有状态），概率较低，且考虑到1. 凌晨n点操作; 2. 能通过补偿快速恢复; 因此新流程中信息的完整性与正确性有一定保障；<br>
 老流程则无影响，大事务，不存在中间状态;</p>
 </li>
 <li>
 <p>什么时候走新流程？</p>
-<p>答：配置新流程可用 &amp; 来自特定上游的定时任务 &amp; 非补偿请求；</p>
+<p>答：配置管理设置为“新流程可用” &amp;&amp; (来自上游定时任务 &amp;&amp; 非补偿请求 || 指定为新流程)；</p>
 </li>
 <li>
 <p>如何判断是补偿请求？</p>
@@ -380,8 +384,9 @@
 </ul>
 <h2><span id="方案3">方案3</span></h2>
 <p>鸵鸟法，看起来线上无影响，不如得过且过好吧。</p>
-<h2><span id="方案对比">方案对比</span></h2>
+<h2><span id="方案对比及思考">方案对比及思考</span></h2>
 <p>建议方案2 或者 3吧，如果上游能改一下代码，则还可以考虑省略加表。</p>
+<p><strong>在涉及到并发批量修改（有insert）事务时，最好要少用唯一索引！！！</strong></p>
 <hr>
 <h1><span id="写在最后">写在最后</span></h1>
 <p>一些参考链接:</p>
@@ -448,7 +453,7 @@
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">说在一切之前</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">问题出现</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">场景</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">前置处理</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.1.</span> <span class="toc-nav-text">环境信息获取</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.2.</span> <span class="toc-nav-text">查看问题影响</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">问题分析</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">事务执行流程简示</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">表结构分析</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.2.1.</span> <span class="toc-nav-text">E表</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.2.2.</span> <span class="toc-nav-text">A表</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.3.</span> <span class="toc-nav-text">情况汇总</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.4.</span> <span class="toc-nav-text">分情况分析</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.4.1.</span> <span class="toc-nav-text">一般情况（较简单）</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.4.2.</span> <span class="toc-nav-text">最常见情况</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.4.3.</span> <span class="toc-nav-text">最不常见情况(较极端)</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">解决方案设计</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.1.</span> <span class="toc-nav-text">限制考虑</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.2.</span> <span class="toc-nav-text">方案2</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.2.1.</span> <span class="toc-nav-text">几个问题</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.3.</span> <span class="toc-nav-text">方案3</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.4.</span> <span class="toc-nav-text">方案对比</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">写在最后</span></a></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">说在一切之前</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">问题出现</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">场景</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">前置处理</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.1.</span> <span class="toc-nav-text">环境信息获取</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.2.</span> <span class="toc-nav-text">查看问题影响</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">问题分析</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">事务执行流程简示</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">表结构分析</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.2.1.</span> <span class="toc-nav-text">E表</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.2.2.</span> <span class="toc-nav-text">A表</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.3.</span> <span class="toc-nav-text">情况汇总</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.4.</span> <span class="toc-nav-text">分情况分析</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.4.1.</span> <span class="toc-nav-text">一般情况（较简单）</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.4.2.</span> <span class="toc-nav-text">最常见情况</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.4.3.</span> <span class="toc-nav-text">最不常见情况(较极端)</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">解决方案设计</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.1.</span> <span class="toc-nav-text">限制考虑</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.2.</span> <span class="toc-nav-text">方案1</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.3.</span> <span class="toc-nav-text">方案2</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.3.1.</span> <span class="toc-nav-text">几个问题</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.4.</span> <span class="toc-nav-text">方案3</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.5.</span> <span class="toc-nav-text">方案对比及思考</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">写在最后</span></a></li></ol>
         
         </div>
       </aside>
