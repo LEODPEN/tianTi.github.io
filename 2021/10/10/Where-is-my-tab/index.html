@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content>
+    <meta name="keyword" content>
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          在Chrome中自由穿梭 - TianTi | LEODPEN
+        
+    </title>
+
+    <link rel="canonical" href="https://mpy634.cn/2021/10/10/Where-is-my-tab/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+<link rel="alternate" href="/feed.xml" title="MPY634" type="application/atom+xml">
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('banner.png')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header">
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#JavaScript" title="JavaScript">JavaScript</a>
+                            
+                              <a class="tag" href="/tags/#Chrome" title="Chrome">Chrome</a>
+                            
+                              <a class="tag" href="/tags/#Datastructure" title="Datastructure">Datastructure</a>
+                            
+                        </div>
+                        <h1>在Chrome中自由穿梭</h1>
+                        <h2 class="subheading">迟来太久的毕业快乐！</h2>
+                        <span class="meta">
+                            Posted by LEODPEN on
+                            2021-10-10
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">MPY634</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h1><span id="写在前面">写在前面</span></h1>
+<p>其实这篇6月初就写了一半，后面因为一些原因咕了。本想着10个人用已经很不错了，没想到前几天看下载量居然还增加了好多，想了想还是把坑填一下hhh。</p>
+<h1><span id="真能提效">真能提效</span></h1>
+<h2><span id="为什么有写chrome插件这个想法">为什么有写Chrome插件这个想法？</span></h2>
+<p>设想一下，在写论文时候，经常要开一大堆tab页来查资料，到后来只能看见图标的存在，根本不知道哪个tab页是什么，会不会导致心态炸裂。又或者有时候在公司查case的时候，开了一堆tab页，希望通过某些id来找到对应的tab页？此外，大费周章来到了正确的tab页，心满意足后想要回到之前的页面，却忘记了是哪一个，又要进行一波“海底捞针”。。。</p>
+<p>遇到这些情况时，可谓是难顶之难顶。</p>
+<div align="center"><img width="100%" height="100%" src="ndjst.png"></div>
+<h2><span id="为什么要自己写">为什么要自己写？</span></h2>
+<p>其实市面上确实已经有一些插件了，但是稍显一般了。。。除去很多细节（比如脱离鼠标随时输入容易误跳转、显示搜索结果有限等等），只看其更新时间，就已经是7、8年前的“经典”插件了，估计很多问题其作者是不会再有更新了。。</p>
+<div align="center"><img width="60%" height="60%" src="oldtool.png"></div>
+<p>又比如Chrome自带的tab搜索功能，其支持了全局窗口的搜索，但是：1. 往往跳转后想回到前一个页面时发现忘记了之前的坐标；2. 搜索结果有点鸡肋，同一个域名下tab标题相同是展示搜索结果相同，无法知道到底是哪个tab页（比如用公司的mq管理平台、db管理平台时问题就体现得淋漓尽致）；但其总体而言很不错，能满足大部分要求了。</p>
+<p>联想到IDEA的前进后退，感觉能极大提高工作效率，于是决定对现有的工具做的不好的功能进行改进，现有工具没有的功能进行添加，现有工具做的好的地方(特指Chrome自带的tab全局搜索)<strong>不集成</strong>。</p>
+<p>我个人一般会Chrome自带搜索和这个工具结合着用。</p>
+<h1><span id="不断进化的丑陋界面与功能">不断进化的丑陋界面与功能</span></h1>
+<h2><span id="简单实现原理">简单实现原理</span></h2>
+<p>最开始只想着用后退功能，结果&quot;内测&quot;时候，某位现在已经离职的同事强烈要求加上前进功能，于是由栈改成了双向链表 + Map；</p>
+<div align="center"><img width="100%" height="100%" src="sxlb.png"></div>
+<p>至于链表中某个节点被关掉了，是否要像IDEA中一样给重新打开，我个人选择实现方式是跳过它直接到达再前一个active的tab页，因为我们目的不是增加tab数量，而是尽量减少它，去合理管理它。</p>
+<p>当然每个链表的数量也不能太多，目前设置的是当数量超过阈值，便随机进行最早入队的随机数量元素(不超过阈值的一半)的delete操作，有兴趣可以瞅瞅代码(<s>离完成时太遥远了有点忘了</s>)。</p>
+<blockquote>
+<p>代码地址：<a href="https://github.com/LEODPEN/Where-is-my-tab" target="_blank" rel="noopener">https://github.com/LEODPEN/Where-is-my-tab</a></p>
+</blockquote>
+<h2><span id="进化的界面">进化的界面</span></h2>
+<p>作为后端狗，最近一次写前端还是用elementUI写vue什么的。。。在我不断学习(乱撸)下，界面逐渐进化为了当前奇奇怪怪的样子(此处感谢某位字节前端同学对我一些js问题的解答，这里祝愿其早日康复)。<br>
+不管怎么说，就依照我的审美而言，好像还可以哈哈<s>摆烂了属于是</s>。。。</p>
+<div align="center"><img width="50%" height="50%" src="jm.png"></div>
+<h1><span id="不如试试看">不如试试看</span></h1>
+<h2><span id="直通车">直通车</span></h2>
+<p>虽然插件本来是自己用的，但还是听了部分人的意见，修修改改了几版，暂时应该不会有大的变动了。</p>
+<div align="center"><img width="50%" height="50%" src="dd.png"></div>
+<p>Chrome商店地址：<a href="https://chrome.google.com/webstore/detail/where-is-my-tab/abccjdbmfpgocjjmebdjogoophngecfe?hl=zh-CN&amp;authuser=0" target="_blank" rel="noopener">https://chrome.google.com/webstore/detail/where-is-my-tab/abccjdbmfpgocjjmebdjogoophngecfe?hl=zh-CN&amp;authuser=0</a></p>
+<blockquote>
+<p>虽然Edge也有上架(极度阉割版)，但是其<code>manifest_version</code>只支持到2。。。不建议用下载这个插件。。</p>
+</blockquote>
+<h2><span id="默认快捷键">默认快捷键</span></h2>
+<ol>
+<li>command + shift + 7 为 打开或关闭搜索页搜索页;</li>
+<li>command + shift + 9 为 tab回退;</li>
+<li>command + shift + 0 为 tab前进;</li>
+<li>windows下command键为Ctrl;</li>
+</ol>
+<h2><span id="快捷键自定义">快捷键自定义</span></h2>
+<p>有些朋友说快捷键反人类，其实是可以自己修改的，键入chrome://extensions/shortcuts直接修改即可(别和现有的冲突)。</p>
+<div align="center"><img width="60%" height="60%" src="kjj.png"></div>
+<h1><span id="进攻就是最好的防守">“进攻就是最好的防守”</span></h1>
+<p>插件用着确实挺舒服的，但是还是建议要注意多清理下tab页。毕<br>
+竟能一眼发现该做什么不是更香吗，而且开太多tab页电脑卡起来属实难顶。。</p>
+<p>“进攻就是最好的防守”，在没法维护当前tab页时候直接全关掉，直接remake，进入下一把，就不用考虑怎么去维护tab页了(亲测有效)。</p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2022/05/14/FULL-GC-GET-OUT/" data-toggle="tooltip" data-placement="top" title="记一次高并发服务的FULL GC问题排查与修复（1/2）">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2021/04/28/MySQL DeadLock/" data-toggle="tooltip" data-placement="top" title="并发情况下长事务的死锁问题分析及解决方案设计">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+<!-- Gitalk start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+      clientID: 'eaf4e00580c99d8e7ea9',
+      clientSecret: '132d835560c11ddcaead2e8d5dfb8b07463cf4e4',
+      repo: 'tianTi.github.io',  //如 'convivae.github.io'
+      owner: 'LEODPEN',
+      admin: ['LEODPEN'], //这是个字符串数组，可填写多个
+      id: location.pathname,      // 页面的唯一标识。长度必须小于50，默认是文章路径
+      distractionFreeMode: true  // 类似Facebook评论框的全屏遮罩效果.
+    });
+    gitalk.render('gitalk-container');
+</script>
+<!-- Gitalk end -->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">写在前面</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">真能提效</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">为什么有写Chrome插件这个想法？</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">为什么要自己写？</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">不断进化的丑陋界面与功能</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">简单实现原理</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">进化的界面</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">不如试试看</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.1.</span> <span class="toc-nav-text">直通车</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.2.</span> <span class="toc-nav-text">默认快捷键</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.3.</span> <span class="toc-nav-text">快捷键自定义</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">“进攻就是最好的防守”</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://godweiyang.com/" target="_blank">godweiyang</a></li>
+                    
+                        <li><a href="https://haventong.github.io/" target="_blank">Haven Tong</a></li>
+                    
+                        <li><a href="https://blog.fun4go.top/" target="_blank">瓜皮</a></li>
+                    
+                        <li><a href="https://yyyujintang.github.io/" target="_blank">Yujin Tang</a></li>
+                    
+                        <li><a href="https://blog.i64d.com/" target="_blank">kblack</a></li>
+                    
+                        <li><a href="http://ciaran.top/" target="_blank">告白于荆州</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+<script type="text/javascript" src="/js/zooming.js"></script>
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/LEODPEN">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; LEODPEN 2022 
+                </p>
+		<p class="copyright text-muted">
+		  <span id="busuanzi_container_site_pv"><span id="busuanzi_value_site_uv"></span></span> visitors up to now.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://mpy634.cn/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="https://mpy634.cn/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

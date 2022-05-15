@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content>
+    <meta name="keyword" content>
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          华东 hackathon 之旅 - TianTi | LEODPEN
+        
+    </title>
+
+    <link rel="canonical" href="https://mpy634.cn/2019/11/27/Hackathon_2019@EastChina/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+<link rel="alternate" href="/feed.xml" title="MPY634" type="application/atom+xml">
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('start.jpg')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header">
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#Life" title="Life">Life</a>
+                            
+                              <a class="tag" href="/tags/#Hackathon" title="Hackathon">Hackathon</a>
+                            
+                              <a class="tag" href="/tags/#Travel" title="Travel">Travel</a>
+                            
+                        </div>
+                        <h1>华东 hackathon 之旅</h1>
+                        <h2 class="subheading">一堆人聚在一起敲代码是让人非常愉悦的</h2>
+                        <span class="meta">
+                            Posted by LEODPEN on
+                            2019-11-27
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">MPY634</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h1><span id="游记-流水账">游记 <s>流水账</s></span></h1>
+<hr>
+<p>OOAD凉凉</p>
+<h2><span id="冲冲冲">冲冲冲？</span></h2>
+<hr>
+<p>   刚刚搞定双创的结项答辩、各科作业、论文复现等等一系列手边工作，月考与Gizmo ball的ddl又立马向我挥手。正当我戴着SKG边电自己脖子边没有灵魂的敲着代码，看见了一位<s>学弟</s>大佬(ccy)找人一天后去hackathon的微信消息。在其简短介绍后我感觉非常有意思<s>就是不想复习</s>, 可是下周一回来就月考加大堆ddl——“社团能报销”学弟的一句话不禁令我陷入了沉思。但是我仍需要表现出对OOAD零预习进度的尊重，于是我说“今天你没找到人我就去”。<s>其实当时已经23.50+</s> 于是怀着对南京之行的憧憬和对考试与作业的歉意下，我们选择周五下午冲冲冲。</p>
+<div align="center"><img width="44%" height="34%" src="xywy.png"></div>
+<!-- ![虚假的回复](xywy.png) -->
+<h2><span id="南航东南大学">南航——东南大学</span></h2>
+<hr>
+<p>   不得不说，在同team的南航朋友(冉兄)一直说他们校区很小的时候，我选择了相信。但是当我们周五晚上实际抵达将军路校区，我发现事情并不这么简单。</p>
+<div align="center"><img width="44%" height="44%" src="1.jpg"></div>
+<!-- ![抵达南航](1.jpg) -->
+<p>   <s>首先和我们学校的中北校区比较大小</s>这我就不用多提了，我觉得有意思的是“海陆空三桥”(我自己乱叫的)跨越高速公路，将学校划成了两个半区，这让人不禁有一种在小城池里面的感觉。。。但是校区里面没有共享单车且不让骑车是挺难的。</p>
+<div align="center"><img width="44%" height="44%" src="2.jpg">（南航地标）</div>
+<!-- ![南航地标](2.jpg) -->
+<p>   鉴于晚上在旅店内搞了搞azure、初步理了理功能和需求等，躺下时候已经比较晚了。然而蚊子仍然选择在夜间缠绕我，属实难顶。不过第二天不间断的闹铃居然让我吃上了早饭，真是太令人感动了。。。</p>
+<p>   刚刚抵达东南大学时候天气是比较热的，和周日离开时候呈现出鲜明对比。我们抵达时教室人已经很多了，不过幸好我们赶上了领贴纸，电脑有了贴纸连代码也升华了(确信)。</p>
+<div align="center"><img width="64%" height="64%" src="4.jpg"></div>
+<!-- ![热](3.jpg) -->
+&emsp;&emsp; 接着便是队伍的介绍，这个环节总是让人非常舒适。
+<div align="center"><img width="80%" height="80%" src="5.png"></div>
+<!-- ![队伍](4.png) -->
+<p>   接下来大多数时间便是在机房度过了。总体感觉下来东南大学的建筑比较稀疏，南航的稍微密集一点 <s>(完美的分析与对比)</s>。</p>
+<h2><span id="喂食">喂食</span></h2>
+<hr>
+<p>   本人对食物一向不挑剔，也不爱拍照，但是为了让游记更像游记，决定强行糊点东西。</p>
+<p>   在南航地头蛇冉兄的带领下，我们去尝试了没有啥味道但是能填饱肚子的川菜和听说比较有名的青浦酿(应该是这样打的吧), 没拍照，不过有点像升级版冰粉，配料很足。</p>
+<p>   在东南大学拥有大量的饭票，除了需要走比较久去食堂外，体验挺不错，对我个人来讲，梅园有个土豆烧牛肉味道很好而且只要12。</p>
+<div align="center"><img width="44%" height="44%" src="6.jpg"></div>
+<!-- ![土豆烧牛肉](6.jpg) -->
+<p>   当大家都说桃园味道不佳后，我们决定还是不去尝试，稳一手海阔天空。有意思的是，我发现牛肉粉丝汤已经变成了大学校园的标配？</p>
+<p>   是的，零食也是极为重要的一环。参加这种熬夜比赛，零食和水是必须的，主办方提供了很多种类的零食，可惜都撑不过三分钟便被一抢而空。</p>
+<div align="center"><img width="44%" height="44%" src="7.png"></div>
+<!-- ![投食](7.png) -->
+<p>   当然作为旅游队伍，我们几乎每次都能吃上零食，这得益于组员们强大的信息收集能力与反应速度。（不过热水真的没找到，以致于学弟的咖啡无用武之地）。</p>
+<h1><span id="比赛">比赛</span></h1>
+<hr>
+<p>事先没有准备的话是难顶的</p>
+<h2><span id="横冲直撞">横冲直撞</span></h2>
+<hr>
+<p>   在ccy阐述其大致思路后(和跑步相关的游戏)，我决定就按照他的来。但当周五晚上我准备开个头时，发现是只有一个大致思路，具体机制和实现形式还很模糊。于是在初步梳理了一下思路后，建了表，着手写接口文档。幸而我对这些已经较熟悉，ccy也十分给力，在前端方面能独挑大梁，于是大家第一步“面向接口文档编程”就行了。</p>
+<p>   功能上的繁复与时间的紧迫程度迫使我直接掏出了自己最熟悉的技术来做，因此在技术实现上没有啥创新（不过达成在第五种语言上用经纬度计算距离成就），在身在机房的开发时间里，抛去复用以前的一些代码和注释代码，我大致写了一千六百多行代码，我们的功能(抛去性能)倒是实现了大部分。</p>
+<h2><span id="带抽象家">带抽象家</span></h2>
+<hr>
+<h3><span id="专业绘制">专业绘制</span></h3>
+<p>   冉兄对安卓较为熟悉，但对web和游戏方面稍微弱点，于是开始绘制起了我们的设计图，图片的风格令人十分满意————<strong>抽象中又带着解释性文字</strong>。</p>
+<div align="center"><img width="44%" height="44%" src="sucai.png"></div>
+<!-- ![素材库](sucai.png) -->
+<p>   接下来我从上面截取的图片挑取部分来做做分析。</p>
+<p><img src="8.png" alt="拉人"></p>
+<p>   此为是group的owner进行拉人操作。</p>
+<p><img src="9.png" alt="转移"></p>
+<p>   group的owner转移小组所有权给一位组员。</p>
+<p><img src="10.png" alt="离开"></p>
+<p>   这是group的一位成员主动选择离开小组。当然，我们最喜欢的还是下面这张地图。</p>
+<p><img src="map.png" alt="map"></p>
+<p>   它也是绘制而成的，为了找到最有价值的路线和坐标点，学弟和南航冉兄在夜间去校内骑车不断将坐标点上传。每每想到他们在寒风中骑车，坐在教室的我就会暂时放下妙脆角，吃一口奥利奥，<strong>用甜味化解心酸</strong>。</p>
+<h3><span id="夜间插曲">夜间插曲</span></h3>
+<hr>
+<p>   不得不说，QQ群属实人才辈出。即使在深夜，也有人在“操作”，对此我也十分想加入，可惜操作系统暂不允许，实乃一大遗憾。</p>
+<!-- <center class="half">
+    <img src="11.jpg" width="300"/>
+    <img src="12.jpg" width="300"/>
+</center> -->
+<div align="center"><img width="34%" height="34%" src="11.jpg"><img width="34%" height="34%" src="12.jpg">(半价最后一天？)</div>
+<!-- ![ccc](11.jpg) -->
+<!-- ![ccc2](12.jpg) -->
+<h2><span id="hackergo">HackerGo</span></h2>
+<hr>
+<p>   周日醒来后整体时间比较紧张，需要做的较多：联调与部署、写计划书、导出接口文档、整理素材和录屏等，一开始说中午十二点便截止，为了尽快搞定，一些bug还没调就得匆匆部署进行录屏，尴尬的是没上https，没法用定位，因此前端还不能部署，于是我们直接手机弄好环境来跑以便录屏。(后面听说时间延迟了，也懒得再搞了)</p>
+<div align="center"><img width="44%" height="44%" src="czz.jpg">(操作中)</div>
+<p>   刚开始答辩的几组的爆破音很是恐怖，于是我选择先小睡一觉，醒来改改模板一个PPT应该就成了。可惜等我醒来，发现已经要轮到我们，于是PPT计划只得作罢 <s>(其实还有点时间，就是不想做)</s> 。</p>
+<p>   不得不说，ccy的想法其实是及其有意思的，只可惜到最后已经没啥时间了，无法很好讲述出其特色，因此还是在此处把我们之前写的的思路和完成情况贴份出来——<a href="https://github.com/Hackathon2019EastChina/HackerGo/issues/1" target="_blank" rel="noopener">构思、done与todo</a></p>
+<p>   对于我个人来言，写隐藏任务是最有意思的，走在路上突然弹出一个隐藏任务，想想就有趣（只是有一定几率刷到河里hh），可惜的是在地图上留言/留语音等一些好玩的功能实在还没来得及操作。</p>
+<h1><span id="最后">最后</span></h1>
+<hr>
+<p>   虽然时间的短暂致使大部分作品都可能有点bug，完成度也不是特别高，但是现场的的确确出现了很多有趣的作品，也有很多创意让人眼前一亮(只是可惜中途睡着了没有听到完整版)。摸着自己的心脏和头发，我诚挚的建议各位少参加几次hackathon，能白嫖的除外。</p>
+<div align="center"><img width="100%" height="100%" src="hz.jpg">(最后人及其不齐的合照)</div>
+<blockquote>
+<p>部分图源来自“官方”摄影，且经过压缩。</p>
+</blockquote>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2020/01/25/Conda onon MacOS Catalina/" data-toggle="tooltip" data-placement="top" title="更新到Catalina后文件被搬家了？风扇狂转？">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2019/10/20/10.20/" data-toggle="tooltip" data-placement="top" title="10.20 写在RNG S9出局后">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+<!-- Gitalk start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+      clientID: 'eaf4e00580c99d8e7ea9',
+      clientSecret: '132d835560c11ddcaead2e8d5dfb8b07463cf4e4',
+      repo: 'tianTi.github.io',  //如 'convivae.github.io'
+      owner: 'LEODPEN',
+      admin: ['LEODPEN'], //这是个字符串数组，可填写多个
+      id: location.pathname,      // 页面的唯一标识。长度必须小于50，默认是文章路径
+      distractionFreeMode: true  // 类似Facebook评论框的全屏遮罩效果.
+    });
+    gitalk.render('gitalk-container');
+</script>
+<!-- Gitalk end -->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">游记 流水账</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">冲冲冲？</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">南航——东南大学</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.3.</span> <span class="toc-nav-text">喂食</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">比赛</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">横冲直撞</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">带抽象家</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.1.</span> <span class="toc-nav-text">专业绘制</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.2.</span> <span class="toc-nav-text">夜间插曲</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.3.</span> <span class="toc-nav-text">HackerGo</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">最后</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://godweiyang.com/" target="_blank">godweiyang</a></li>
+                    
+                        <li><a href="https://haventong.github.io/" target="_blank">Haven Tong</a></li>
+                    
+                        <li><a href="https://blog.fun4go.top/" target="_blank">瓜皮</a></li>
+                    
+                        <li><a href="https://yyyujintang.github.io/" target="_blank">Yujin Tang</a></li>
+                    
+                        <li><a href="https://blog.i64d.com/" target="_blank">kblack</a></li>
+                    
+                        <li><a href="http://ciaran.top/" target="_blank">告白于荆州</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+<script type="text/javascript" src="/js/zooming.js"></script>
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/LEODPEN">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; LEODPEN 2022 
+                </p>
+		<p class="copyright text-muted">
+		  <span id="busuanzi_container_site_pv"><span id="busuanzi_value_site_uv"></span></span> visitors up to now.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://mpy634.cn/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="https://mpy634.cn/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
