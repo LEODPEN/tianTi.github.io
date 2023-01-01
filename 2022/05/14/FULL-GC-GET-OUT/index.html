@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content>
+    <meta name="keyword" content>
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          记一次高并发服务的FULL GC问题排查与修复（1/2） - TianTi | LEODPEN
+        
+    </title>
+
+    <link rel="canonical" href="https://mpy634.cn/2022/05/14/FULL-GC-GET-OUT/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+<link rel="alternate" href="/feed.xml" title="MPY634" type="application/atom+xml">
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('jvm.png')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header">
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#Java" title="Java">Java</a>
+                            
+                              <a class="tag" href="/tags/#Jvm" title="Jvm">Jvm</a>
+                            
+                              <a class="tag" href="/tags/#Full gc" title="Full gc">Full gc</a>
+                            
+                        </div>
+                        <h1>记一次高并发服务的FULL GC问题排查与修复（1/2）</h1>
+                        <h2 class="subheading">难道我也有JVM调优的机会了？</h2>
+                        <span class="meta">
+                            Posted by LEODPEN on
+                            2022-05-14
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">MPY634</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h1><span id="依旧是一切之前">依旧是一切之前</span></h1>
+<p>距离上一次更新已经是太久了，中间也想过更新一些比如在之前公司自己写的日志工具如何做到用了反射也很快，想过写如何压测分析然后让接口RT降低接近40%等等什么的，甚至想过出一篇阿卡丽如何单杀大师青钢影的教学，但是想着也没太大技术含量，不好意思献丑（且有点懒），就一直建了目录就不了了之。这几天一想，已经是要成为了这么久的社畜了，再不记录一下足迹，22年上半年就要过去了。。刚好有个东西稍微值得写写，那就记一下吧，同时，也希望上海早点解封，这样也好吃到宇哥的散伙饭。（<s>当然，裕兴记和老乡鸡就算了</s></p>
+<h1><span id="机器再见full-gc你好">机器再见，full gc你好</span></h1>
+<p>最近一年来经济属实不太行，公司也要求降本增效，原来有一堆冗余机器的服务需要一减再减，因此原来因为机器多而隐藏的问题就逐渐浮现了出来。。比如以前服务的单机QPS上限预估为2000+，而如今需要承载3000+，因为单机流量的上涨，内存再也不等待每日凌晨x点的主动gc，直接就在下午纷纷开始跳水，属实影响服务性能。又如每天的流量高峰期时，一些弹性机器刚刚出来，便&quot;出道即巅峰&quot;，直接开始走向full gc的不归路。</p>
+<blockquote>
+<p>如何让机器即可以尽可能承载更多的流量，又不会每天有额外的full gc，这是一个急需解决的问题。</p>
+</blockquote>
+<h1><span id="问题分析">问题分析</span></h1>
+<h2><span id="线上基本配置">线上基本配置</span></h2>
+<p>简要说下基本情况，服务单机是日常单机平均2500QPS左右，周内峰值在3200QPS左右，内存占用速度与流量大小承正相关。</p>
+<p>服务使用jdk8，机器内存为8G，jvm参数为(只展示这里较为需要的几个，例如CICompilerCount等不予展示)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Xms4096m -Xmx4096m -Xmn2g -XX:MetaspaceSize=512m -XX:MaxMetaspaceSize=512m XX:CMSInitiatingOccupancyFraction=70</span><br></pre></td></tr></table></figure>
+<p>易知堆内存为4G，其中新生代占2G，老年代占2G。而非一般的老比新为3:1的关系，这也彰显着服务可能流量稍高一点。当然，从此我们也能简单退出以下几点：</p>
+<ol>
+<li>eden区占1.6G，两个survivor区分别200MB左右；</li>
+<li>老年代占用到1.4G时会触发full gc。</li>
+</ol>
+<h2><span id="线上场景分析">线上场景分析</span></h2>
+<p>说完了配置，来看看线上机器的新生代，老年代以及survivor区的一般时期的运行情况（模拟版）。</p>
+<div align="center"><img width="80%" height="80%" src="Eden.png"></div>
+<p>首先是Eden区，因为服务流量比较大，所以这小小的一个多G的内存不一会儿就会被占满，然后触发minor gc。时间上来看每隔1-2min就会触发一次，看起来虽是蛮频繁的，但是gc时间也都在100ms左右，对吞吐量无大影响。除此之外，并没有什么问题。</p>
+<div align="center"><img width="80%" height="80%" src="Olden.png"></div>
+<p>然后是老年代，看起来老年代确实是随着时间慢慢被填满的，没有什么突然的某一次minor gc前后的猛然提高，说明排除大对象什么的影响。此外，主动gc 以及 额外的full gc之后，老年代的所占内存极速下降到了200MB - 300MB 左右，也不存在大量对象清理不掉的情况。那是不是很多对象就应该在minor gc就被干掉才对呢？</p>
+<div align="center"><img width="80%" height="80%" src="Survivor.png"></div>
+<p>最后再来看看survivor区，看着波动并不是特别的明显，随着每次minor gc，确实内存占用是有下降的，每次晋升点到老年代倒也正常。</p>
+<p>但是！！这survivor区可是每个分配了200MB左右，你一个survivor区一直占用才在50MB下波动是不是太过分了呢？二话不说，直接上机器把gc日志搞下来看看minor gc前对象晋升年龄分布，结果发现确实有点东西。。。</p>
+<div align="center"><img width="80%" height="80%" src="ages.png"></div>
+<p>因为大多都差不多一样数据，那么久截取其中一个简单解读下，就是说</p>
+<ol>
+<li>当前的晋升年龄是6，即这一次gc会把年龄为6的对象扔进老年代；</li>
+<li>survivor区当对象 &lt;= 某个年龄段n的对象 大于 107MB时，会修改晋升阈值为n；当然这里的desired是通过<code>-XX:+printTenuringDestribution</code>可以改的，但是一般都使用的默认的50，因此这里就是100MB左右（意为回收后希望survivor区就一直这个比例）；</li>
+<li>当前survivor区对象占用内存之和不足 23MB；</li>
+</ol>
+<p>其实我们只要看过一些相关的理论书籍（比如《深入理解Java虚拟机》），那么看到这里通常会有两个疑问：</p>
+<ol>
+<li>为什么max 为 6 而不是 15？（书中说过默认晋升年龄是15）</li>
+<li>不是说jvm能动态计算晋升年龄吗，为何总是和6一样？</li>
+</ol>
+<h3><span id="为什么max-为-6-而不是-15">为什么max 为 6 而不是 15？</span></h3>
+<p>这里可以参考Oracle的官网参数说明：<a href="https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html</a> ，直接搜<code>-XX:MaxTenuringThreshold=threshold</code>，可以看到这么一句话：</p>
+<p><code>Sets the maximum tenuring threshold for use in adaptive GC sizing. The largest value is 15. The default value is 15 for the parallel (throughput) collector, and 6 for the CMS collector.</code></p>
+<p>于是破案了，咱只是最大能设置为15，具体默认多少还得取决于用了什么垃圾收集器，这里我们用的CMS，因此就是6。。。那么根据前面的情况分析，full gc中很多对象还是应该可以在minor gc时候干掉才对，加上日志看出jvm的动态计算阈值就&quot;几乎&quot;没小于过6(注意是几乎，这里引出另外的问题) 以及 survivor区利用率就20%左右，因此我们完全可以提升一些晋升年龄阈值。</p>
+<h3><span id="为何jvm动态计算出的晋升年龄总是和6一样">为何jvm动态计算出的晋升年龄总是和6一样？</span></h3>
+<p>我们都知道jvm是有动态计算晋升年龄的逻辑的，那么为什么明显6已经是不太合理的情况下，图中还是显示 &quot;new threshold 6&quot;呢？</p>
+<p>我们可以看下jvm中关于这里的关键代码（注：survivor_capacity默认是50）</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">uint ageTable::compute_tenuring_threshold(<span class="keyword">size_t</span> survivor_capacity) &#123;</span><br><span class="line">  <span class="keyword">size_t</span> desired_survivor_size = (<span class="keyword">size_t</span>)((((<span class="keyword">double</span>) survivor_capacity)*TargetSurvivorRatio)/<span class="number">100</span>);</span><br><span class="line">  <span class="keyword">size_t</span> total = <span class="number">0</span>;</span><br><span class="line">  uint age = <span class="number">1</span>;</span><br><span class="line">  assert(sizes[<span class="number">0</span>] == <span class="number">0</span>, <span class="string">"no objects with age zero should be recorded"</span>);</span><br><span class="line">  <span class="keyword">while</span> (age &lt; table_size) &#123;</span><br><span class="line">    <span class="comment">// table_size为16，这里也是为什么最大age可设置为15</span></span><br><span class="line">    total += sizes[age];</span><br><span class="line">    <span class="keyword">if</span> (total &gt; desired_survivor_size) <span class="keyword">break</span>;</span><br><span class="line">    age++;</span><br><span class="line">  &#125;</span><br><span class="line">  uint result = age &lt; MaxTenuringThreshold ? age : MaxTenuringThreshold;</span><br></pre></td></tr></table></figure>
+<p>计算动态晋升年龄阈值n的逻辑其实很简单，不多赘述了。<br>
+直接看最后一行，我们计算得到一个动态年龄age，然后和我们设置的阈值进行比较，两者取一个较小值。那么其实我们设置一个正常的阈值，则jvm计算的动态年龄age肯定一般比6大的，但是这里计算出来的age则基本是7了，那么new threshold 长期为 6 也就不足为奇了。</p>
+<h1><span id="问题处理与预告">问题处理与预告</span></h1>
+<p>知道了问题所在，本着不改太多也能work的原则，我对晋升年龄进行了手动指定，这样保证其在高峰期也是能让老年代以较低水平上升；</p>
+<p>我在线上灰度了一台机器，效果十分OK，类似下图：</p>
+<div align="center"><img width="80%" height="80%" src="multi.png"></div>
+<p>有没有一种万马奔腾，我自佁然不动的快感呢hhh。那么是否还可以爆改，比如进一步降低老年代空间什么的呢，我想当然是可以的，但是必要性不大，因为目前这个minor gc的耗时就很好，不是很高，毕竟过早优化是万恶之源。</p>
+<p>诶等下，为何在大家都在奔向full gc时候，有一匹黑🐴(实则为绿线)突然凭空杀出，而且迅速赶超第一名，率先会发起full gc呢？</p>
+<p>仔细一看，原来是因为流量上涨被自动扩容出来的弹性机器呀，话说按照常理来看服务启动后老年代不就300MB左右吗，为什么这一出来就800MB左右了呢，这不是&quot;出道即巅峰&quot;了吗？</p>
+<p>难道真的是弹性机器弱于&quot;人&quot;，下一篇博客里直接为其平反！</p>
+<blockquote>
+<p>说明一下首先我是1. 两个问题都解决了再灰度的, 2. 不全是因为懒而分两篇，也因为这确实是两个问题，有一种递进感hh；另外，只能说，对&quot;出道即巅峰&quot;的排查和修复更有意思(<s>估计也要写更多</s>)。。。</p>
+</blockquote>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2022/12/31/FULL-GC-GET-OUT2/" data-toggle="tooltip" data-placement="top" title="记一次高并发服务的FULL GC问题排查与修复（2/2）">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2021/10/10/Where-is-my-tab/" data-toggle="tooltip" data-placement="top" title="在Chrome中自由穿梭">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+<!-- Gitalk start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+      clientID: 'eaf4e00580c99d8e7ea9',
+      clientSecret: '132d835560c11ddcaead2e8d5dfb8b07463cf4e4',
+      repo: 'tianTi.github.io',  //如 'convivae.github.io'
+      owner: 'LEODPEN',
+      admin: ['LEODPEN'], //这是个字符串数组，可填写多个
+      id: location.pathname,      // 页面的唯一标识。长度必须小于50，默认是文章路径
+      distractionFreeMode: true  // 类似Facebook评论框的全屏遮罩效果.
+    });
+    gitalk.render('gitalk-container');
+</script>
+<!-- Gitalk end -->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">依旧是一切之前</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">机器再见，full gc你好</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">问题分析</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">线上基本配置</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">线上场景分析</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.2.1.</span> <span class="toc-nav-text">为什么max 为 6 而不是 15？</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.2.2.</span> <span class="toc-nav-text">为何jvm动态计算出的晋升年龄总是和6一样？</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">问题处理与预告</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://godweiyang.com/" target="_blank">godweiyang</a></li>
+                    
+                        <li><a href="https://haventong.github.io/" target="_blank">Haven Tong</a></li>
+                    
+                        <li><a href="https://blog.fun4go.top/" target="_blank">瓜皮</a></li>
+                    
+                        <li><a href="https://yyyujintang.github.io/" target="_blank">Yujin Tang</a></li>
+                    
+                        <li><a href="https://blog.i64d.com/" target="_blank">kblack</a></li>
+                    
+                        <li><a href="http://ciaran.top/" target="_blank">告白于荆州</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+<script type="text/javascript" src="/js/zooming.js"></script>
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/LEODPEN">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; LEODPEN 2023 
+                </p>
+		<p class="copyright text-muted">
+		  <span id="busuanzi_container_site_pv"><span id="busuanzi_value_site_uv"></span></span> visitors up to now.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://mpy634.cn/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="https://mpy634.cn/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

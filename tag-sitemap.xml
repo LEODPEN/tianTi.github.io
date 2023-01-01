@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="sitemap.xsl"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    <url>
+        <loc>https://mpy634.cn/tags/LOL/</loc>
+        <lastmod>2022-12-30T05:00:15.452Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/%E6%95%B0%E6%A8%A1/</loc>
+        <lastmod>2022-12-30T05:00:15.452Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/MacOs/</loc>
+        <lastmod>2022-12-30T05:00:15.460Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Python/</loc>
+        <lastmod>2022-12-30T05:00:15.460Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Hackathon/</loc>
+        <lastmod>2022-12-30T05:00:15.464Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Travel/</loc>
+        <lastmod>2022-12-30T05:00:15.464Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Life/</loc>
+        <lastmod>2022-12-30T05:00:15.490Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Shell/</loc>
+        <lastmod>2022-12-30T05:00:15.490Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Tool/</loc>
+        <lastmod>2022-12-30T05:00:15.490Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/MySQL-5-x/</loc>
+        <lastmod>2022-12-30T05:00:15.494Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Transaction/</loc>
+        <lastmod>2022-12-30T05:00:15.494Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/DeadLock/</loc>
+        <lastmod>2022-12-30T05:00:15.494Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/%E4%BA%91%E8%AE%A1%E7%AE%97/</loc>
+        <lastmod>2022-12-30T05:00:15.498Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/JavaScript/</loc>
+        <lastmod>2022-12-30T05:00:15.505Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Chrome/</loc>
+        <lastmod>2022-12-30T05:00:15.505Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Datastructure/</loc>
+        <lastmod>2022-12-30T05:00:15.505Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Usage/</loc>
+        <lastmod>2022-12-30T05:00:15.509Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Blog/</loc>
+        <lastmod>2022-12-30T05:00:15.509Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Java/</loc>
+        <lastmod>2023-01-01T16:24:47.742Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Jvm/</loc>
+        <lastmod>2023-01-01T16:24:47.742Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Full-gc/</loc>
+        <lastmod>2023-01-01T16:24:47.742Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Jetty/</loc>
+        <lastmod>2023-01-01T16:24:47.742Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://mpy634.cn/tags/Servlet/</loc>
+        <lastmod>2023-01-01T16:24:47.742Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+</urlset>
+<!-- XML Sitemap generated by Hexo SEO Friendly Sitemap Generator -->

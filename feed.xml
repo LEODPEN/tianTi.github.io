@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>MPY634</title>
+  <icon>https://www.gravatar.com/avatar/1a28252beaf38df1169ad4470015902c</icon>
+  <subtitle>向上，登天梯</subtitle>
+  <link href="https://mpy634.cn/feed.xml" rel="self"/>
+  
+  <link href="https://mpy634.cn/"/>
+  <updated>2023-01-01T16:24:47.742Z</updated>
+  <id>https://mpy634.cn/</id>
+  
+  <author>
+    <name>LEODPEN</name>
+    <email>446110075@qq.com</email>
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>记一次高并发服务的FULL GC问题排查与修复（2/2）</title>
+    <link href="https://mpy634.cn/2022/12/31/FULL-GC-GET-OUT2/"/>
+    <id>https://mpy634.cn/2022/12/31/FULL-GC-GET-OUT2/</id>
+    <published>2022-12-30T20:44:44.000Z</published>
+    <updated>2023-01-01T16:24:47.742Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html"></summary>
+        
+      
+    
+    
+    
+    <category term="usage" scheme="https://mpy634.cn/categories/usage/"/>
+    
+    <category term="summary" scheme="https://mpy634.cn/categories/usage/summary/"/>
+    
+    
+    <category term="Java" scheme="https://mpy634.cn/tags/Java/"/>
+    
+    <category term="Jvm" scheme="https://mpy634.cn/tags/Jvm/"/>
+    
+    <category term="Full gc" scheme="https://mpy634.cn/tags/Full-gc/"/>
+    
+    <category term="Jetty" scheme="https://mpy634.cn/tags/Jetty/"/>
+    
+    <category term="Servlet" scheme="https://mpy634.cn/tags/Servlet/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>记一次高并发服务的FULL GC问题排查与修复（1/2）</title>
+    <link href="https://mpy634.cn/2022/05/14/FULL-GC-GET-OUT/"/>
+    <id>https://mpy634.cn/2022/05/14/FULL-GC-GET-OUT/</id>
+    <published>2022-05-14T14:44:44.000Z</published>
+    <updated>2022-12-31T16:02:48.007Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html"></summary>
+        
+      
+    
+    
+    
+    <category term="usage" scheme="https://mpy634.cn/categories/usage/"/>
+    
+    
+    <category term="Java" scheme="https://mpy634.cn/tags/Java/"/>
+    
+    <category term="Jvm" scheme="https://mpy634.cn/tags/Jvm/"/>
+    
+    <category term="Full gc" scheme="https://mpy634.cn/tags/Full-gc/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>在Chrome中自由穿梭</title>
+    <link href="https://mpy634.cn/2021/10/10/Where-is-my-tab/"/>
+    <id>https://mpy634.cn/2021/10/10/Where-is-my-tab/</id>
+    <published>2021-10-10T13:59:59.000Z</published>
+    <updated>2022-12-30T05:00:15.505Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html"></summary>
+        
+      
+    
+    
+    
+    <category term="usage" scheme="https://mpy634.cn/categories/usage/"/>
+    
+    <category term="tool" scheme="https://mpy634.cn/categories/usage/tool/"/>
+    
+    
+    <category term="JavaScript" scheme="https://mpy634.cn/tags/JavaScript/"/>
+    
+    <category term="Chrome" scheme="https://mpy634.cn/tags/Chrome/"/>
+    
+    <category term="Datastructure" scheme="https://mpy634.cn/tags/Datastructure/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>并发情况下长事务的死锁问题分析及解决方案设计</title>
+    <link href="https://mpy634.cn/2021/04/28/MySQL%20DeadLock/"/>
+    <id>https://mpy634.cn/2021/04/28/MySQL%20DeadLock/</id>
+    <published>2021-04-28T08:44:44.000Z</published>
+    <updated>2022-12-30T05:00:15.494Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html"></summary>
+        
+      
+    
+    
+    
+    <category term="usage" scheme="https://mpy634.cn/categories/usage/"/>
+    
+    
+    <category term="Java" scheme="https://mpy634.cn/tags/Java/"/>
+    
+    <category term="MySQL 5.x" scheme="https://mpy634.cn/tags/MySQL-5-x/"/>
+    
+    <category term="Transaction" scheme="https://mpy634.cn/tags/Transaction/"/>
+    
+    <category term="DeadLock" scheme="https://mpy634.cn/tags/DeadLock/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>写个脚本来定时健康打卡</title>
+    <link href="https://mpy634.cn/2020/11/23/Health-Script/"/>
+    <id>https://mpy634.cn/2020/11/23/Health-Script/</id>
+    <published>2020-11-23T04:13:14.000Z</published>
+    <updated>2022-12-30T05:00:15.490Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html"></summary>
+        
+      
+    
+    
+    
+    <category term="code" scheme="https://mpy634.cn/categories/code/"/>
+    
+    <category term="usage" scheme="https://mpy634.cn/categories/code/usage/"/>
+    
+    
+    <category term="Life" scheme="https://mpy634.cn/tags/Life/"/>
+    
+    <category term="Shell" scheme="https://mpy634.cn/tags/Shell/"/>
+    
+    <category term="Tool" scheme="https://mpy634.cn/tags/Tool/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>新浪云部署war包</title>
+    <link href="https://mpy634.cn/2020/04/17/SAE/"/>
+    <id>https://mpy634.cn/2020/04/17/SAE/</id>
+    <published>2020-04-17T04:44:44.000Z</published>
+    <updated>2022-12-30T05:00:15.498Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html"></summary>
+        
+      
+    
+    
+    
+    <category term="usage" scheme="https://mpy634.cn/categories/usage/"/>
+    
+    
+    <category term="Java" scheme="https://mpy634.cn/tags/Java/"/>
+    
+    <category term="云计算" scheme="https://mpy634.cn/tags/云计算/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>更新到Catalina后文件被搬家了？风扇狂转？</title>
+    <link href="https://mpy634.cn/2020/01/25/Conda%20onon%20MacOS%20Catalina/"/>
+    <id>https://mpy634.cn/2020/01/25/Conda%20onon%20MacOS%20Catalina/</id>
+    <published>2020-01-24T17:01:00.000Z</published>
+    <updated>2022-12-30T05:00:15.460Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html"></summary>
+        
+      
+    
+    
+    
+    <category term="usage" scheme="https://mpy634.cn/categories/usage/"/>
+    
+    
+    <category term="MacOs" scheme="https://mpy634.cn/tags/MacOs/"/>
+    
+    <category term="Python" scheme="https://mpy634.cn/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>华东 hackathon 之旅</title>
+    <link href="https://mpy634.cn/2019/11/27/Hackathon_2019@EastChina/"/>
+    <id>https://mpy634.cn/2019/11/27/Hackathon_2019@EastChina/</id>
+    <published>2019-11-27T12:08:22.000Z</published>
+    <updated>2022-12-30T05:00:15.464Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html"></summary>
+        
+      
+    
+    
+    
+    <category term="experience" scheme="https://mpy634.cn/categories/experience/"/>
+    
+    
+    <category term="Life" scheme="https://mpy634.cn/tags/Life/"/>
+    
+    <category term="Hackathon" scheme="https://mpy634.cn/tags/Hackathon/"/>
+    
+    <category term="Travel" scheme="https://mpy634.cn/tags/Travel/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>10.20 写在RNG S9出局后</title>
+    <link href="https://mpy634.cn/2019/10/20/10.20/"/>
+    <id>https://mpy634.cn/2019/10/20/10.20/</id>
+    <published>2019-10-20T04:01:00.000Z</published>
+    <updated>2022-12-30T05:00:15.452Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html"></summary>
+        
+      
+    
+    
+    
+    <category term="LOL" scheme="https://mpy634.cn/categories/LOL/"/>
+    
+    
+    <category term="LOL" scheme="https://mpy634.cn/tags/LOL/"/>
+    
+    <category term="Life" scheme="https://mpy634.cn/tags/Life/"/>
+    
+    <category term="数模" scheme="https://mpy634.cn/tags/数模/"/>
+    
+  </entry>
+  
+  <entry>
+    <title> A Test At First</title>
+    <link href="https://mpy634.cn/2019/05/21/hexo-theme-beantech/"/>
+    <id>https://mpy634.cn/2019/05/21/hexo-theme-beantech/</id>
+    <published>2019-05-21T02:51:24.000Z</published>
+    <updated>2022-12-30T05:00:15.509Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html"></summary>
+        
+      
+    
+    
+    
+    <category term="usage" scheme="https://mpy634.cn/categories/usage/"/>
+    
+    
+    <category term="Usage" scheme="https://mpy634.cn/tags/Usage/"/>
+    
+    <category term="Blog" scheme="https://mpy634.cn/tags/Blog/"/>
+    
+  </entry>
+  
+</feed>

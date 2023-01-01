@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content>
+    <meta name="keyword" content>
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          记一次高并发服务的FULL GC问题排查与修复（2/2） - TianTi | LEODPEN
+        
+    </title>
+
+    <link rel="canonical" href="https://mpy634.cn/2022/12/31/FULL-GC-GET-OUT2/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+<link rel="alternate" href="/feed.xml" title="MPY634" type="application/atom+xml">
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('jvm.png')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header">
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#Java" title="Java">Java</a>
+                            
+                              <a class="tag" href="/tags/#Jvm" title="Jvm">Jvm</a>
+                            
+                              <a class="tag" href="/tags/#Full gc" title="Full gc">Full gc</a>
+                            
+                              <a class="tag" href="/tags/#Jetty" title="Jetty">Jetty</a>
+                            
+                              <a class="tag" href="/tags/#Servlet" title="Servlet">Servlet</a>
+                            
+                        </div>
+                        <h1>记一次高并发服务的FULL GC问题排查与修复（2/2）</h1>
+                        <h2 class="subheading">暨年终总结</h2>
+                        <span class="meta">
+                            Posted by LEODPEN on
+                            2022-12-31
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">MPY634</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h3><span id="问题回顾">问题回顾</span></h3>
+<p>上一篇说到，我通过调整动态晋升年龄阈值n，保证了服务在高峰期也是能让老年代内存占用以较低速度上升，但同时发现在高峰期的弹性机器总是“出道即巅峰”（即刚刚弹出就将full gc）</p>
+<div align="center"><img width="60%" height="60%" src="multi.png"></div>
+<blockquote>
+<p>高峰期如果经常出现弹性的单机问题（尤其是交易链路）无疑是不太能接受的。</p>
+</blockquote>
+<h3><span id="问题分析">问题分析</span></h3>
+<h4><span id="被冤枉的弹性机器与有意思的类-不常见的finalizer们">被“冤枉”的弹性机器与有意思的类 - 不常见的Finalizer们</span></h4>
+<p>发现所有的弹性机器都有相关问题，且每天如此，这不能说是巧合。于是看发布时普通机器情况，原来也有相同问题 —— 服务在刚部署启动时，内存占用会飙升，不一会儿便full gc。</p>
+<p>无法直接判断问题所在，我找了一台特定弹性机器，在其full gc 前后分别dump内存。</p>
+<div align="center"><img width="60%" height="60%" src="dump1.png"></div>
+这是full gc后的内存情况，较正常，说明一次 full gc后服务归于正常，这也和实际情况相符。
+<div align="center"><img width="60%" height="60%" src="dump2.png"></div>
+<p>在gc前的内存的dump中很直观的发现了一些不常见的类名：</p>
+<p><code>java.lang.ref.Finalizer, java.util.zip.ZStreamRef, java.util.zip.Inlater</code></p>
+<p><code>Finalizer</code>对象明显较多，此种对象至少得经理两次GC才能被回收，因为需要先让FinalizerThread先执行一次<code>finalize</code>方法才能被下次gc回收掉，但是有可能这中间时间过长，导致gc已过多次而一直未执行<code>finalize</code>方法，那么<code>Finalize</code>r们可能直接飞升老年代去引发full gc。</p>
+<p>接着看dump内容，发现被包装为<code>Finalizer</code>的对象蛮多的，有正常的<code>SocksSocketImpl</code>（网络连接）、<code>FileOutputStream</code>（文件流）之流，不过这些都需要有操作系统有直接交互，占用着外部资源，需要额外维护与释放，没啥问题。在众多实例中，部分对象跳了出来：</p>
+<div align="center"><img width="60%" height="60%" src="dump3.png"></div>
+<p>超级多的<code>Inflater</code>实例，以及<code>ZipFile$ZipFileInputStream</code>,<code>ZipFile$ZipFileInflaterInputStream</code>，还有<code>JarFile</code>（自然其均是重载了finalize方法）。且<code>ZipFileInputStream</code> 以及 <code>ZipFileInflaterInputStream</code>均为<code>java.util.zip.ZipFile</code>的内部类。</p>
+<p>由注释等可知<code>ZipFile</code>（<code>This class is used to read entries from a zip file.</code>） 以及 <code>Inlater</code>（<code>This class provides support for general purpose decompression using the popular ZLIB compression library.</code>）用处主要在于去解压文件信息。（且在gc后几乎无上方所提及得zip相关内容）</p>
+<p><strong>作出推断，服务在启动时有一些文件被疯狂解压，然后生成了一大堆文件解压的相关类实例，它们作为<code>Finalizer</code>对象不能及时被回收，在一次又一次的<code>young gc</code>后依旧存活，直到跑进老年代使得其猛涨。</strong></p>
+<blockquote>
+<p>不得不说，ZStreamRef在jdk11里面就没了，而且这玩意儿还有死循环的问题：<a href="https://bugs.openjdk.org/browse/JDK-8193682" target="_blank" rel="noopener">https://bugs.openjdk.org/browse/JDK-8193682</a></p>
+</blockquote>
+<h4><span id="逮捕元凶-jetty">逮捕元凶 - Jetty</span></h4>
+<p>就着上面的猜想，首先在代码中看有无直接调用方法去解压某些上传or下载的内容，发现并没有。<br>
+接着感觉是某一个插件把目录下Jars都解压了一遍，排查并询问了近期新引入jar包的同学们，却并未有太多头绪，情况一时间僵住。</p>
+<p>还是得自力更生，对着dump文件一顿操作，发现jar名字相关的<code>Finalizer</code>对象有<code>JarFile</code>、<code>Inlfater</code>、<code>UrlJarFile</code>等等，尤其时在gc前<code>JarFile</code>数量极多。此外，我发现了gc前出现了一个可疑的名字<code>JarFileResource</code>。点进一看，发现其全限定名为<code>org.eclipse.jetty.util.resource.JarFileResource</code>。<br>
+（注：该服务使用的Web容器为<code>Jetty</code>而非<code>Tomcat</code>）</p>
+<div align="center"><img width="60%" height="60%" src="dump4.png"></div>
+<p>也可以看到其属性<code>_path</code>有指向特定的class，且<code>_jarUrl</code>指向了<code>/web/INF/lib/</code>目录下某个具体的jar包，由此做出推断，一个<code>JarFileResource</code>对象就对应这一个jar包的一个类或者说一个文件，是在服务部署启动时<code>Jetty</code>组件疯狂解压jar包的罪证（产物证明）。</p>
+<blockquote>
+<p>注：注意观察路径为<code>/web/INF/lib/</code>且jarUrl前缀为<code>jar:/file</code></p>
+</blockquote>
+<p>既然问题点已经基本锁定，则有多种办法继续推进：直接Google搜索相关信息看下有无类似情况，直接打开<code>jetty.xml</code>线下修改配置并调试(前提是比较了解)，或者是先再排查下可能切入点。</p>
+<h4><span id="由果溯因-从代码到代码">由果溯因 - 从代码到代码</span></h4>
+<blockquote>
+<p>如果觉得代码分析内容过长，可跳过 “由果溯因 - 从代码到代码”部分内容</p>
+</blockquote>
+<p><code>Jetty</code>整体来说就是由多个<code>Connector</code>，多个<code>Handler</code>以及一个<code>Threadpool</code>组成的，前者可用于实现<code>Http</code>服务器（有着<code>IO</code>模型、应用协议等的封装），后者则是可以实现<code>Servlet</code>容器等，不过不像<code>Tomcat</code>每个连接器都有自己的线程池，<code>Jetty</code>中是大家共享一个全局的（其他二者实现的区别例如service概念，二者如何监听不同端口等等不再展开）。</p>
+<p>当然，<code>handler</code>才是<code>Jetty</code>灵魂所在，其使得<code>Jetty</code>非常灵活（依旧具体不展开），如果说有地方在服务启动时疯狂解压jar包，那么一定只能是<code>handler</code>中找，因此可以目光直接看向配置文件<code>Jetty.xml</code>的hanler相关内容。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Set</span> <span class="attr">name</span>=<span class="string">"handler"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">New</span> <span class="attr">id</span>=<span class="string">"Handlers"</span> <span class="attr">class</span>=<span class="string">"org.eclipse.jetty.server.handler.HandlerCollection"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Set</span> <span class="attr">name</span>=<span class="string">"handlers"</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">Array</span> <span class="attr">type</span>=<span class="string">"org.eclipse.jetty.server.Handler"</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">Item</span>&gt;</span>  </span><br><span class="line">                <span class="tag">&lt;<span class="name">New</span> <span class="attr">class</span>=<span class="string">"org.eclipse.jetty.webapp.WebAppContext"</span>&gt;</span>    </span><br><span class="line">                    <span class="comment">&lt;!-- 其余set例如contextPath省略 --&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">Set</span> <span class="attr">name</span>=<span class="string">"configurationClasses"</span>&gt;</span><span class="tag">&lt;<span class="name">Ref</span> <span class="attr">id</span>=<span class="string">"plusConfig"</span>/&gt;</span><span class="tag">&lt;/<span class="name">Set</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">New</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">Item</span>&gt;</span></span><br><span class="line">             <span class="comment">&lt;!-- 其他handler例如RequestLogHandler省略 --&gt;</span></span><br><span class="line">         <span class="tag">&lt;/<span class="name">Array</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">Set</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">New</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">Set</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Array</span> <span class="attr">id</span>=<span class="string">"plusConfig"</span> <span class="attr">type</span>=<span class="string">"java.lang.String"</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 其他config省略，只列出问题所在 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Item</span>&gt;</span>com.sankuai.mms.boot.RJRAnnotationConfiguration<span class="tag">&lt;/<span class="name">Item</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Array</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><code>HandlerCollection</code>其实也是handler，但是其内部包含着多个其他handler的引用（数组）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 最新版为AtomicReference，而服务中版本还是真数组</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> Handler[] _handlers;</span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">final</span> AtomicReference&lt;Handlers&gt; _handlers = <span class="keyword">new</span> AtomicReference&lt;&gt;();</span><br></pre></td></tr></table></figure>
+<p><code>WebAppContext</code>则是继承自<code>ScopeHandler</code>（如果说要和<code>HandlerCollection</code>同级的那就是<code>HanlderWrapper</code>）.<code>ScopeHandler</code>内部只有一个<code>handler</code>的引用，显而易见的，为了链式调用。</p>
+<p>代码块中只列出了<code>WebAppContext</code>，是因为其作为一个<code>ContextHandler</code>(其会创建&amp;初始化一些servletcontext对象)，内部还管理着<code>ServletHandler</code>等等，而<code>ServletHandler</code>可是真正实现了Servlet规范中的功能（<code>Servlet</code>, <code>Filter</code>, <code>Listener</code>）。</p>
+<blockquote>
+<p>这块继承和实现关系不展开，有兴趣可以详细瞅下~~</p>
+</blockquote>
+<p>好了接下来直接看代码溯源问题，看看<code>Finalizer</code>们是怎么来的：</p>
+<ol>
+<li><code>WebAppContext</code>启动（由于其实现了<code>LifeCycle</code>，直接看<code>start</code>方法）</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/******** WebAppContext ********/</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doStart</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">  <span class="keyword">try</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 省略前</span></span><br><span class="line">            preConfigure();</span><br><span class="line">            <span class="comment">// 这里一路向上，可以看到在ContextHandler中处理了一系列类加载器</span></span><br><span class="line">            <span class="comment">// 最终还是调用了this.startContext();而WebAppContext中有所重载</span></span><br><span class="line">            <span class="keyword">super</span>.doStart();</span><br><span class="line">            postConfigure();</span><br><span class="line">            <span class="comment">// 省略后</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (Throwable t) &#123;</span><br><span class="line">            <span class="comment">// 省略</span></span><br><span class="line">      &#125;        </span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">startContext</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">   <span class="comment">// 新版有所优化，先确保了 configure()成功才会接着执行。。。（其实就是加了个if）</span></span><br><span class="line">    configure();</span><br><span class="line">    <span class="comment">// xml解析</span></span><br><span class="line">    _metadata.resolve(<span class="keyword">this</span>);</span><br><span class="line">    <span class="comment">// 继续start，最终启动app</span></span><br><span class="line">    <span class="keyword">super</span>.startContext();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 新版多封装了一层_configurations，先sort了一下;老版（此文服务）直接for循环调用</span></span><br><span class="line"><span class="comment">// preConfigure 以及 postConfigure类似</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">configure</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">      <span class="comment">// return _configurations.configure(this);</span></span><br><span class="line">      <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>._configurations.length; ++i) &#123;</span><br><span class="line">          <span class="keyword">this</span>._configurations[i].preConfigure(<span class="keyword">this</span>);</span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/******** Configuration interface ********/</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">preConfigure</span><span class="params">(WebAppContext context)</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">configure</span><span class="params">(WebAppContext context)</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">postConfigure</span><span class="params">(WebAppContext context)</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line"><span class="comment">// 其他方法，例如clone省略</span></span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>结果上看最终是<code>RJRAnnotationConfiguration</code>有问题，因其是公司内部封装的类，且核心功能在于其被继承的类，故直接看<code>AnnotationConfiguration</code>即可。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/******** AnnotationConfiguration ********/</span></span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(WebAppContext context)</span> <span class="keyword">throws</span> Exception</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">// 省略</span></span><br><span class="line">        <span class="comment">// 顾名思义，此处为扫所有的注解</span></span><br><span class="line">        <span class="keyword">if</span> (!_discoverableAnnotationHandlers.isEmpty() || _classInheritanceHandler != <span class="keyword">null</span> || !_containerInitializerAnnotationHandlers.isEmpty())</span><br><span class="line">            scanForAnnotations(context);</span><br><span class="line">        <span class="comment">// 省略</span></span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * Perform scanning of classes for discoverable</span></span><br><span class="line"><span class="comment">  * annotations such as WebServlet/WebFilter/WebListener</span></span><br><span class="line"><span class="comment">  *</span></span><br><span class="line"><span class="comment">  * <span class="doctag">@param</span> context the context for the scan</span></span><br><span class="line"><span class="comment">  * <span class="doctag">@throws</span> Exception if unable to scan</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">scanForAnnotations</span><span class="params">(WebAppContext context)</span></span></span><br><span class="line"><span class="function">        <span class="keyword">throws</span> Exception</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">// JAVA版本相关，省略</span></span><br><span class="line">        <span class="comment">// 日志打印，省略</span></span><br><span class="line">        <span class="comment">//scan selected jars on the container classpath first</span></span><br><span class="line">        parseContainerPath(context, parser);</span><br><span class="line">        <span class="comment">//email from Rajiv Mordani jsrs 315 7 April 2010</span></span><br><span class="line">        <span class="comment">//    If there is a &lt;others/&gt; then the ordering should be</span></span><br><span class="line">        <span class="comment">//          WEB-INF/classes the order of the declared elements + others.</span></span><br><span class="line">        <span class="comment">//    In case there is no others then it is</span></span><br><span class="line">        <span class="comment">//          WEB-INF/classes + order of the elements.</span></span><br><span class="line">        parseWebInfClasses(context, parser);</span><br><span class="line">        <span class="comment">//scan non-excluded, non medatadata-complete jars in web-inf lib</span></span><br><span class="line">        parseWebInfLib(context, parser);</span><br><span class="line">        <span class="comment">//execute scan, either effectively synchronously (1 thread only), or asynchronously (limited by number of processors available) </span></span><br><span class="line">        <span class="keyword">final</span> Semaphore task_limit = (isUseMultiThreading(context) ? <span class="keyword">new</span> Semaphore(ProcessorUtils.availableProcessors()) : <span class="keyword">new</span> Semaphore(<span class="number">1</span>));</span><br><span class="line">        <span class="keyword">final</span> CountDownLatch latch = <span class="keyword">new</span> CountDownLatch(_parserTasks.size());</span><br><span class="line">        <span class="keyword">final</span> MultiException me = <span class="keyword">new</span> MultiException();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">final</span> ParserTask p : _parserTasks)</span><br><span class="line">        &#123;</span><br><span class="line">            task_limit.acquire();</span><br><span class="line">            context.getServer().getThreadPool().execute(<span class="keyword">new</span> Runnable()</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span></span><br><span class="line"><span class="function">                </span>&#123;</span><br><span class="line">                    <span class="keyword">try</span></span><br><span class="line">                    &#123;</span><br><span class="line">                        p.call();</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">catch</span> (Exception e)</span><br><span class="line">                    &#123;</span><br><span class="line">                        me.add(e);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">finally</span></span><br><span class="line">                    &#123;</span><br><span class="line">                        task_limit.release();</span><br><span class="line">                        latch.countDown();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>根据注释可知，此方法扫描所想找到的注解是<code>WebServlet</code>/<code>WebFilter</code>/<code>WebListener</code>这三个注解。此外值得一提的是，<code>scanForAnnotations</code>中分了三个具体方法，然后均会生成<code>parseTask</code>,并行去解析相关jar包内容。</p>
+<ol start="3">
+<li>根据注释可知，其中<code>parseContainerPath</code>扫描容器目录下的jar包，<code>parseWebInfClasses</code>则是扫<code>WEB-INF</code>目录下的class文件，<code>parseWebInfLib</code>则是扫<code>WEB-INF/lib</code>下的jar包。根据dump中情况可知，主要看<code>parseWebInfLib</code>即可。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">/**</span></span><br><span class="line"><span class="comment">  * Scan jars in WEB-INF/lib. Only jars selected by MetaInfConfiguration,  and that are not excluded by an ordering will be considered.</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">parseWebInfLib</span><span class="params">(<span class="keyword">final</span> WebAppContext context, <span class="keyword">final</span> AnnotationParser parser)</span> <span class="keyword">throws</span> Exception</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        List&lt;Resource&gt; jars = context.getMetaData().getWebInfResources(context.getMetaData().isOrdered());</span><br><span class="line">        <span class="keyword">for</span> (Resource r : jars)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//for each jar, we decide which set of annotations we need to parse for</span></span><br><span class="line">            <span class="keyword">final</span> Set&lt;Handler&gt; handlers = <span class="keyword">new</span> HashSet&lt;Handler&gt;();</span><br><span class="line">            FragmentDescriptor f = context.getMetaData().getFragmentDescriptorForJar(r);</span><br><span class="line">            <span class="comment">//if its from a fragment jar that is metadata complete, we should skip scanning for @webservlet etc</span></span><br><span class="line">            <span class="comment">// but yet we still need to do the scanning for the classes on behalf of  the servletcontainerinitializers</span></span><br><span class="line">            <span class="comment">//if a jar has no web-fragment.xml we scan it (because it is not excluded by the ordering)</span></span><br><span class="line">            <span class="comment">//or if it has a fragment we scan it if it is not metadata complete</span></span><br><span class="line">            <span class="keyword">if</span> (f == <span class="keyword">null</span> || !WebDescriptor.isMetaDataComplete(f) || _classInheritanceHandler != <span class="keyword">null</span> || !_containerInitializerAnnotationHandlers.isEmpty())</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">//register the classinheritance handler if there is one</span></span><br><span class="line">                <span class="keyword">if</span> (_classInheritanceHandler != <span class="keyword">null</span>)</span><br><span class="line">                    handlers.add(_classInheritanceHandler);</span><br><span class="line">                <span class="comment">//register the handlers for the @HandlesTypes values that are themselves annotations if there are any</span></span><br><span class="line">                handlers.addAll(_containerInitializerAnnotationHandlers);</span><br><span class="line">                <span class="comment">//only register the discoverable annotation handlers if this fragment is not metadata complete, or has no fragment descriptor</span></span><br><span class="line">                <span class="keyword">if</span> (f == <span class="keyword">null</span> || !WebDescriptor.isMetaDataComplete(f))</span><br><span class="line">                    handlers.addAll(_discoverableAnnotationHandlers);</span><br><span class="line">                <span class="keyword">if</span> (_parserTasks != <span class="keyword">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// 注：都是这个task，说明内部parse逻辑还有区别</span></span><br><span class="line">                    ParserTask task = <span class="keyword">new</span> ParserTask(parser, handlers, r);</span><br><span class="line">                    _parserTasks.add(task);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>注释上看属于是既要又要还要，全都想扫。</p>
+<ol start="4">
+<li>接着看具体task内容，其核心逻辑在于<code>AnnotationParser#parse</code>（注：主要看扫Jar包的，例如<code>ScanClass</code>等方法忽略）</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/******** AnnotationParser ********/</span></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Parse a resource</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> handlers the handlers to look for classes in</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> r the resource to parse</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception if unable to parse</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">parse</span><span class="params">(<span class="keyword">final</span> Set&lt;? extends Handler&gt; handlers, Resource r)</span> <span class="keyword">throws</span> Exception</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (r == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">if</span> (r.exists() &amp;&amp; r.isDirectory())</span><br><span class="line">        &#123;</span><br><span class="line">            parseDir(handlers, r);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        String fullname = r.toString();</span><br><span class="line">        <span class="keyword">if</span> (fullname.endsWith(<span class="string">".jar"</span>))</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="comment">// 主要看这个，对应着jar包</span></span><br><span class="line">            parseJar(handlers, r);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (fullname.endsWith(<span class="string">".class"</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">try</span> (InputStream is = r.getInputStream())</span><br><span class="line">            &#123;</span><br><span class="line">                scanClass(handlers, <span class="keyword">null</span>, is);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Parse a resource that is a jar file.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> handlers the handlers to look for classes in</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> jarResource the jar resource to parse</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception if unable to parse</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">parseJar</span><span class="params">(Set&lt;? extends Handler&gt; handlers, Resource jarResource)</span> <span class="keyword">throws</span> Exception</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (jarResource == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">if</span> (jarResource.toString().endsWith(<span class="string">".jar"</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            MultiException me = <span class="keyword">new</span> MultiException();</span><br><span class="line">            <span class="keyword">try</span> (MultiReleaseJarFile jarFile = <span class="keyword">new</span> MultiReleaseJarFile(jarResource.getFile(), _javaPlatform, <span class="keyword">false</span>))</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// 封装成JarInputStream以便解压</span></span><br><span class="line">                jarFile.stream().forEach(e -&gt;</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">try</span></span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="comment">// 具体处理逻辑</span></span><br><span class="line">                        parseJarEntry(handlers, jarResource, e);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">catch</span> (Exception ex)</span><br><span class="line">                    &#123;</span><br><span class="line">                        me.add(<span class="keyword">new</span> RuntimeException(<span class="string">"Error scanning entry "</span> + e.getName() + <span class="string">" from jar "</span> + jarResource, ex));</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line">            &#125;</span><br><span class="line">            me.ifExceptionThrow();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>注：<code>JarInputStream</code> extends <code>ZipInputStream</code>，<code>ZipInputStream</code>又extends <code>InflaterInputStream</code>，<code>Finalizer</code>中有<code>InflaterInputStream</code>一席之地的原因找到。<br>
+而创建<code>InflaterInputStream</code>对象时会new出一个decompressor，那就是<code>Inlfater</code> :<br>
+<code>super(new PushbackInputStream(in, 512), new Inflater(true), 512);</code>，Finalizer中出现<code>Inlfater</code>众多的原因在此。</p>
+<ol start="5">
+<li>再看看我们的最终产物怎么来的，直奔<code>AnnotationParser#parseJarEntry</code>：</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/******** AnnotationParser ********/</span></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Parse a single entry in a jar file</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> handlers the handlers to look for classes in</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> entry the entry in the potentially MultiRelease jar resource to parse</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> jar the jar file</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception if unable to parse</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">parseJarEntry</span><span class="params">(Set&lt;? extends Handler&gt; handlers, Resource jar, MultiReleaseJarFile.VersionedJarEntry entry)</span></span></span><br><span class="line"><span class="function">        <span class="keyword">throws</span> Exception</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (jar == <span class="keyword">null</span> || entry == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        <span class="comment">//skip directories</span></span><br><span class="line">        <span class="keyword">if</span> (entry.isDirectory())</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">        String name = entry.getName();</span><br><span class="line">        <span class="comment">//check file is a valid class file name</span></span><br><span class="line">        <span class="keyword">if</span> (isValidClassFileName(name) &amp;&amp; isValidClassFilePath(name))</span><br><span class="line">        &#123;</span><br><span class="line">            String shortName = StringUtil.replace(name, <span class="string">'/'</span>, <span class="string">'.'</span>).substring(<span class="number">0</span>, name.length() - <span class="number">6</span>);</span><br><span class="line">            <span class="comment">// 资源组装</span></span><br><span class="line">            addParsedClass(shortName, Resource.newResource(<span class="string">"jar:"</span> + jar.getURI() + <span class="string">"!/"</span> + entry.getNameInJar()));</span><br><span class="line">            <span class="keyword">if</span> (LOG.isDebugEnabled())</span><br><span class="line">                LOG.debug(<span class="string">"Scanning class from jar &#123;&#125;!/&#123;&#125;"</span>, jar, entry);</span><br><span class="line">            <span class="keyword">try</span> (InputStream is = entry.getInputStream())</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// 前面有出现过。asm解析类文件</span></span><br><span class="line">                scanClass(handlers, jar, is);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">/******** Resource ********/</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Resource <span class="title">newResource</span><span class="params">(URL url)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> newResource(url, __defaultUseCaches);</span><br><span class="line">    &#125;</span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Construct a resource from a url.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> url the url for which to make the resource</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> useCaches true enables URLConnection caching if applicable to the type of resource</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> a new resource from the given URL</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">static</span> Resource <span class="title">newResource</span><span class="params">(URL url, <span class="keyword">boolean</span> useCaches)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (url == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        String urlString = url.toExternalForm();</span><br><span class="line">        <span class="comment">// context启动该时扫描加过file</span></span><br><span class="line">        <span class="keyword">if</span> (urlString.startsWith(<span class="string">"file:"</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">try</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> PathResource(url);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">catch</span> (Exception e)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (LOG.isDebugEnabled())</span><br><span class="line">                    LOG.warn(<span class="string">"Bad PathResource: &#123;&#125;"</span>, url, e);</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    LOG.warn(<span class="string">"Bad PathResource: &#123;&#125; &#123;&#125;"</span>, url, e.toString());</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> BadResource(url, e.toString());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 明显走的这个分支，在前面parseJarEntry方法中又加了一次前缀</span></span><br><span class="line">        <span class="comment">// jar包中的class文件~</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (urlString.startsWith(<span class="string">"jar:file:"</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> JarFileResource(url, useCaches);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 纯jar包</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (urlString.startsWith(<span class="string">"jar:"</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> JarResource(url, useCaches);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> URLResource(url, <span class="keyword">null</span>, useCaches);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p><code>JarFileResource</code>的出现源于此，且其中有属性<code>private JarFile _jarFile;</code>，故gc前有着大量<code>JarFile</code>的<code>Finalizer</code>实例也破案~</p>
+<blockquote>
+<p>JarFileResource类具体可见：<a href="https://github1s.com/eclipse/jetty.project/blob/HEAD/jetty-util/src/main/java/org/eclipse/jetty/util/resource/JarFileResource.java,https://www.eclipse.org/jetty/javadoc/jetty-9/org/eclipse/jetty/util/resource/JarFileResource.html" target="_blank" rel="noopener">https://github1s.com/eclipse/jetty.project/blob/HEAD/jetty-util/src/main/java/org/eclipse/jetty/util/resource/JarFileResource.java,https://www.eclipse.org/jetty/javadoc/jetty-9/org/eclipse/jetty/util/resource/JarFileResource.html</a></p>
+</blockquote>
+<h4><span id="因果之前-为何需要扫注解">因果之前 - 为何需要扫注解</span></h4>
+<p>为什么需要扫描注解？其实通过前面代码中注解查看，可以看到扫注解主要扫的是三个，即WebServlet/WebFilter/WebListener，其实这均为<code>Servlet3.0</code>的注解，其是为了降低<code>web.xml</code>的书写复杂度而引入的（简化示例：<a href="https://stackoverflow.com/questions/9966655/servlet-3-0-webservlet-use-what-will-be-in-web-xml%EF%BC%89%E3%80%82" target="_blank" rel="noopener">https://stackoverflow.com/questions/9966655/servlet-3-0-webservlet-use-what-will-be-in-web-xml）。</a></p>
+<p><code>Jetty</code>为了支持此特性，引入了<code>org.eclipse.jetty.annotations.AnnotationConfiguration</code>来扫<code>Jar</code>包中的所有<code>class</code>文件。</p>
+<h4><span id="总结因果-链路整体分析">总结因果 - 链路整体分析</span></h4>
+<p><code>Jetty</code>为了支持<code>Servlet3.0</code>的注解功能，在启动时，<code>AnnotationConfiguration</code>会扫描<code>WEB-INF/lib</code>目录下的<code>Jar</code>的所有<code>class</code>文件以解析其是否由使用注解，中间产生了大量用于解压的<code>Finalizer</code>类实例例如<code>Inflater</code>，又最终生成了大量<code>Finalizer</code>资源实例例如<code>JarFileResource</code>及<code>JarFile</code>。因为其所产生量级大，速度快，young gc多次一直无法回收，于是大量对象直接涌入老年代，导致弹性机器“出道即巅峰”，启动后很快就需要<code>full gc</code>。</p>
+<blockquote>
+<p>可以预见的是，随着服务引入的jar包增多，情况会逐渐恶化。</p>
+</blockquote>
+<h3><span id="因果之后-如何解决">因果之后 - 如何解决</span></h3>
+<p>说来蛮有意思，服务中引入了相关config以支持使用注解，但是使用的<code>Servlet</code>版本才在2.4，根本用不上注解，于是我爽快的删除了相关配置。</p>
+<p>线下测试后上线，发现启动时老年代内存占用已从原来得800MB+降至不到300MB，问题成功解决。</p>
+<p>其实第一篇Full gc和第二篇虽然是同一个服务，但是原因却天差地别。这也说明了Full gc产生的原因属实多种多样，也许是参数不合理，也许是本身业务代码问题（乱建对象等），还有可能是引入的插件有问题（一个升级，或修改一个配置可能就中招），而这其中有些是可以规避的，有些则是难以事前规避的，因此还是需要积累经验，合理利用相关内存分析工具，日志分析工具。并适时锻炼下互联网信息检索、源代码嗅觉等，这样才能更快定位并解决问题。</p>
+<h3><span id="写在最后">写在最后</span></h3>
+<p>不知不觉已经是到2022年的末尾了，看着朋友圈各式晒网易云年终总结，突然想起来今年还有个坑没填，想着赶紧得趁着自己还在决赛圈来补上。不曾想年久失修得记忆以及超出设想的一系列问题还是让我延迟了好久才完成。</p>
+<p>2022在生活和工作上都有所进步，养料来源众多——书报、面谈、会议、论坛、文章、视频等等，深切体会到一味闭门造车不可取，人确实是社会关系的总和，是需要在交流中才可获得进步。</p>
+<p>这一年发生了太多事情，让人不止一次的想到，“人类的总体命运是乐观的，而人类个体的命运是悲观的”。但是在农历年末亦临近之时，我只诚切希望大家都能远离XBB，快乐度过春节！</p>
+<blockquote>
+<p>新的一年，在这里立个小目标，更新超过两篇…</p>
+</blockquote>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                        <li class="next">
+                            <a href="/2022/05/14/FULL-GC-GET-OUT/" data-toggle="tooltip" data-placement="top" title="记一次高并发服务的FULL GC问题排查与修复（1/2）">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+<!-- Gitalk start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+      clientID: 'eaf4e00580c99d8e7ea9',
+      clientSecret: '132d835560c11ddcaead2e8d5dfb8b07463cf4e4',
+      repo: 'tianTi.github.io',  //如 'convivae.github.io'
+      owner: 'LEODPEN',
+      admin: ['LEODPEN'], //这是个字符串数组，可填写多个
+      id: location.pathname,      // 页面的唯一标识。长度必须小于50，默认是文章路径
+      distractionFreeMode: true  // 类似Facebook评论框的全屏遮罩效果.
+    });
+    gitalk.render('gitalk-container');
+</script>
+<!-- Gitalk end -->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">问题回顾</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">问题分析</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">被“冤枉”的弹性机器与有意思的类 - 不常见的Finalizer们</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">逮捕元凶 - Jetty</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.3.</span> <span class="toc-nav-text">由果溯因 - 从代码到代码</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.4.</span> <span class="toc-nav-text">因果之前 - 为何需要扫注解</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.5.</span> <span class="toc-nav-text">总结因果 - 链路整体分析</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">因果之后 - 如何解决</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">写在最后</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://godweiyang.com/" target="_blank">godweiyang</a></li>
+                    
+                        <li><a href="https://haventong.github.io/" target="_blank">Haven Tong</a></li>
+                    
+                        <li><a href="https://blog.fun4go.top/" target="_blank">瓜皮</a></li>
+                    
+                        <li><a href="https://yyyujintang.github.io/" target="_blank">Yujin Tang</a></li>
+                    
+                        <li><a href="https://blog.i64d.com/" target="_blank">kblack</a></li>
+                    
+                        <li><a href="http://ciaran.top/" target="_blank">告白于荆州</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+<script type="text/javascript" src="/js/zooming.js"></script>
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/LEODPEN">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; LEODPEN 2023 
+                </p>
+		<p class="copyright text-muted">
+		  <span id="busuanzi_container_site_pv"><span id="busuanzi_value_site_uv"></span></span> visitors up to now.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://mpy634.cn/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="https://mpy634.cn/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
