@@ -149,6 +149,13 @@
 
                         
                         <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
                             <a href="/about/">About</a>
                         </li>
                         
@@ -157,13 +164,6 @@
                         
                         <li>
                             <a href="/archive/">Archives</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
-                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
@@ -229,14 +229,14 @@
 <h4><span id="被冤枉的弹性机器与有意思的类-不常见的finalizer们">被“冤枉”的弹性机器与有意思的类 - 不常见的Finalizer们</span></h4>
 <p>发现所有的弹性机器都有相关问题，且每天如此，这不能说是巧合。于是看发布时普通机器情况，原来也有相同问题 —— 服务在刚部署启动时，内存占用会飙升，不一会儿便full gc。</p>
 <p>无法直接判断问题所在，我找了一台特定弹性机器，在其full gc 前后分别dump内存。</p>
-<div align="center"><img width="60%" height="60%" src="dump1.png"></div>
+<div align="center"><img width="80%" height="80%" src="dump1.png"></div>
 这是full gc后的内存情况，较正常，说明一次 full gc后服务归于正常，这也和实际情况相符。
-<div align="center"><img width="60%" height="60%" src="dump2.png"></div>
+<div align="center"><img width="80%" height="80%" src="dump2.png"></div>
 <p>在gc前的内存的dump中很直观的发现了一些不常见的类名：</p>
 <p><code>java.lang.ref.Finalizer, java.util.zip.ZStreamRef, java.util.zip.Inlater</code></p>
 <p><code>Finalizer</code>对象明显较多，此种对象至少得经理两次GC才能被回收，因为需要先让FinalizerThread先执行一次<code>finalize</code>方法才能被下次gc回收掉，但是有可能这中间时间过长，导致gc已过多次而一直未执行<code>finalize</code>方法，那么<code>Finalize</code>r们可能直接飞升老年代去引发full gc。</p>
 <p>接着看dump内容，发现被包装为<code>Finalizer</code>的对象蛮多的，有正常的<code>SocksSocketImpl</code>（网络连接）、<code>FileOutputStream</code>（文件流）之流，不过这些都需要有操作系统有直接交互，占用着外部资源，需要额外维护与释放，没啥问题。在众多实例中，部分对象跳了出来：</p>
-<div align="center"><img width="60%" height="60%" src="dump3.png"></div>
+<div align="center"><img width="80%" height="80%" src="dump3.png"></div>
 <p>超级多的<code>Inflater</code>实例，以及<code>ZipFile$ZipFileInputStream</code>,<code>ZipFile$ZipFileInflaterInputStream</code>，还有<code>JarFile</code>（自然其均是重载了finalize方法）。且<code>ZipFileInputStream</code> 以及 <code>ZipFileInflaterInputStream</code>均为<code>java.util.zip.ZipFile</code>的内部类。</p>
 <p>由注释等可知<code>ZipFile</code>（<code>This class is used to read entries from a zip file.</code>） 以及 <code>Inlater</code>（<code>This class provides support for general purpose decompression using the popular ZLIB compression library.</code>）用处主要在于去解压文件信息。（且在gc后几乎无上方所提及得zip相关内容）</p>
 <p><strong>作出推断，服务在启动时有一些文件被疯狂解压，然后生成了一大堆文件解压的相关类实例，它们作为<code>Finalizer</code>对象不能及时被回收，在一次又一次的<code>young gc</code>后依旧存活，直到跑进老年代使得其猛涨。</strong></p>
@@ -248,7 +248,7 @@
 接着感觉是某一个插件把目录下Jars都解压了一遍，排查并询问了近期新引入jar包的同学们，却并未有太多头绪，情况一时间僵住。</p>
 <p>还是得自力更生，对着dump文件一顿操作，发现jar名字相关的<code>Finalizer</code>对象有<code>JarFile</code>、<code>Inlfater</code>、<code>UrlJarFile</code>等等，尤其时在gc前<code>JarFile</code>数量极多。此外，我发现了gc前出现了一个可疑的名字<code>JarFileResource</code>。点进一看，发现其全限定名为<code>org.eclipse.jetty.util.resource.JarFileResource</code>。<br>
 （注：该服务使用的Web容器为<code>Jetty</code>而非<code>Tomcat</code>）</p>
-<div align="center"><img width="60%" height="60%" src="dump4.png"></div>
+<div align="center"><img width="80%" height="80%" src="dump4.png"></div>
 <p>也可以看到其属性<code>_path</code>有指向特定的class，且<code>_jarUrl</code>指向了<code>/web/INF/lib/</code>目录下某个具体的jar包，由此做出推断，一个<code>JarFileResource</code>对象就对应这一个jar包的一个类或者说一个文件，是在服务部署启动时<code>Jetty</code>组件疯狂解压jar包的罪证（产物证明）。</p>
 <blockquote>
 <p>注：注意观察路径为<code>/web/INF/lib/</code>且jarUrl前缀为<code>jar:/file</code></p>

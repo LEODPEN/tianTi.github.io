@@ -145,6 +145,13 @@
 
                         
                         <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
                             <a href="/about/">About</a>
                         </li>
                         
@@ -153,13 +160,6 @@
                         
                         <li>
                             <a href="/archive/">Archives</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
-                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
@@ -226,7 +226,7 @@
 <h2><span id="线上基本配置">线上基本配置</span></h2>
 <p>简要说下基本情况，服务单机是日常单机平均2500QPS左右，周内峰值在3200QPS左右，内存占用速度与流量大小承正相关。</p>
 <p>服务使用jdk8，机器内存为8G，jvm参数为(只展示这里较为需要的几个，例如CICompilerCount等不予展示)：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Xms4096m -Xmx4096m -Xmn2g -XX:MetaspaceSize=512m -XX:MaxMetaspaceSize=512m XX:CMSInitiatingOccupancyFraction=70</span><br></pre></td></tr></table></figure>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Xms4096m -Xmx4096m -Xmn2g -XX:<span class="attribute">MetaspaceSize</span>=512m -XX:<span class="attribute">MaxMetaspaceSize</span>=512m XX:<span class="attribute">CMSInitiatingOccupancyFraction</span>=70</span><br></pre></td></tr></table></figure>
 <p>易知堆内存为4G，其中新生代占2G，老年代占2G。而非一般的老比新为3:1的关系，这也彰显着服务可能流量稍高一点。当然，从此我们也能简单退出以下几点：</p>
 <ol>
 <li>eden区占1.6G，两个survivor区分别200MB左右；</li>
